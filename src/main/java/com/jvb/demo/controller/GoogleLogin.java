@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class GoogleLogin {
     private static String GET_TOKEN_URL = "https://accounts.google.com/o/oauth2/token";
     private static String GET_USER_INFOR_URL = "https://www.googleapis.com/oauth2/v1/userinfo?access_token=";
-    private static String CLIENT_ID = "374289014721-r1qkm5v05o9lnoj6ugqtlhq7fg0iilli.apps.googleusercontent.com";
+    private static String CLIENT_ID = "374289014721-r1qkm5v05o9lnoj6ugqtlhq7fg0 iilli.apps.googleusercontent.com";
     private static String SECRET_KEY = "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";
 
     @GetMapping("/login")
