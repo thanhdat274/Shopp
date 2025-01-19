@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <base href="/">
+        <meta charset="utf-8">
+        <title th:text="${'Đơn hàng #'+ orderDTO.id}"></title>
+        <script src="js/jquery-3.6.0.min.js"></script>
+        <script src="js/bootstrap.min.js"></script>
+        <link href="images/favicon.png" rel="shortcut icon">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap.min.css" >
+        <link rel="stylesheet" href="css/app.css">
+        <style>
+            .table-p__variant-list>li>span, .table-p__category>a{
+                color: black;
+            }
+            thead>tr>td:not(:first-child) {
+                text-align: center;
+            }
+            thead>tr>td{
+                color: #333333;
+            }
+            .table-p{
+                margin-bottom: 30px;
+            }
+            .btn-fix{
+                margin-top: 10px;
+                width: 100%;
+            }
+            .quantity-invalid{
+                color: red;
+                font-size: 14px;
+                font-style: italic;
+            }
+            .modal-body{
+                color: black;
+            }
+            .modal-body>span{
+                font-style: italic;
+                color: red;
+            }
+            .border-box{
+                padding: 15px;
+            }
+
+            .order-box{
+                width: 50%;
+                padding: 0 15px;
+                margin: 12px 0
+            }
+            .order-line{
+                display: flex;
+                color: black;
+                padding: 5px 0;
+            }
+            .order-line .label{
+                width: 40%;
+                text-align: left;
+                margin-right: 0;
+                line-height: normal;
+            }
+            .order-line .text{
+                font-weight: 600;
+                width: 60%;
+            }
+            .order-title{
+                font-weight: 600;
+                color: black;
+                padding: 5px 0 5px 15px;
+                background-color: #e8e8e8;
+            }
+            .order-status-label{
+                color:white;
+                border-radius: 10px;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 28px;
+                padding: 4px;
+            }
+            .order-status-label.red{
+                background-color: red;
+            }
+            .order-status-label.green{
+                background-color: green;
+            }
+        </style>
+    </head>
+    <body>
+        <form id="form-order-accept" hidden method="post" th:action="@{/order/admin/accept}">
+            <input th:value="${orderDTO.id}" name="id">
+        </form>
+        <form id="form-order-shipping" hidden method="post" th:action="@{/order/admin/update/status}">
+            <input th:value="${orderDTO.id}" name="id">
+            <input value="SHIPPING" name="order_status">
+        </form>
+        <form  id="form-order-shipped" hidden method="post" th:action="@{/order/admin/update/status}">
+            <input th:value="${orderDTO.id}" name="id">
+            <input value="SHIPPED" name="order_status">
+        </form>
+        <form id="form-order-failed" hidden method="post" th:action="@{/order/admin/update/status}">
+            <input th:value="${orderDTO.id}" name="id">
+            <input value="SHIPMENT_FAILED" name="order_status">
+        </form>
+        <form id="form-reject-order" hidden method="post" th:action="@{/order/admin/reject}">
+            <input th:value="${orderDTO.id}" name="id">
+        </form>
+        <div style="display: flex;">
+            <!-- Navbar -->
+            <div  th:replace="/header/navbar-admin :: navbar-admin"></div>
+            <div id="page-content-wrapper" style="position: relative;">
+                <div th:if="${!#strings.isEmpty(error)}" th:text="${error}" class="alert alert-danger" style="position: absolute;top: 20px;height: 50px;left: 15px;right: 15px;">
+                </div>
+                <div th:if="${!#strings.isEmpty(success)}" th:text="${success}" class="alert alert-success" style="position: absolute;top: 20px;height: 50px;left: 15px;right: 15px;"></div>
+                <div class="container">
+                    <div class="wrapper border-box">
+                        <ul class="breadcrumb__list">
+                            <li class="has-separator">
+                                <a href="/admin">Trang chủ</a>
+                            </li>
+                            <li class="has-separator">
+                                <a href="/order/all/admin">Quản lý đơn hàng</a>
+                            </li>
+                            <li class="is-marked">
+                                <a th:href="@{/order/admin/{id}(id=${orderDTO.id})}" th:text="${'Đơn hàng #'+ orderDTO.id}"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="wrapper border-box">
+                        <div class="row">
+                            <div style="display: flex;width: 100%;flex-wrap: wrap;">
+                                <div class="order-box">
+                                    <div class="order-title">Thông tin đơn hàng</div>
+                                    <div class="order-line">
+                                        <div class="label">Mã đơn hàng:</div>
+                                        <div class="text" th:text="${orderDTO.id}"></div>
+                                    </div>
+                                    <div th:if="${orderDTO.shipmentDTO.order_code != null}" class="order-line">
+                                        <div class="label">Mã đơn GHN:</div>
+                                        <div class="text" th:text="${orderDTO.shipmentDTO.order_code}"></div>
+                                    </div>
+                                    <div class="order-line">
+                                        <div class="label">Ngày đặt hàng: </div>
+                                        <div class="text" th:text="${#temporals.format(orderDTO.create_date, 'dd/MM/yyyy HH:mm')}"></div>
+                                    </div>
+                                    <div th:if="${orderDTO.shipmentDTO.expected_delivery_date != null}" class="order-line">
+                                        <div class="label">Ngày giao dự kiến:</div>
+                                        <div class="text" th:text="${#temporals.format(orderDTO.shipmentDTO.expected_delivery_date, 'dd/MM/yyyy')}"></div>
+                                    </div>
+                                    <div class="order-line">
+                                        <div class="label">Trạng thái đơn hàng:</div>
+                                        <th:block class="dash__link dash__link--brand"
+                                            th:switch="${orderDTO.status.name()}">
+                                            <span th:case="UNPAID" class="order-status-label red">Chưa
+                                                thanh toán</span>
+                                            <span th:case="PROCESSING" class="order-status-label green">Chờ
+                                                xác nhận</span>
+                                            <span th:case="CONFIRMED" class="order-status-label green">Đã xác
+                                                nhận</span>
+                                            <span th:case="CANCELED" class="order-status-label red">Người mua hủy đơn
+                                            </span>
+                                            <span th:case="REJECTED" class="order-status-label red">Shop hủy đơn</span>
+                                            <span th:case="SHIPPING" class="order-status-label green">Đang
+                                                giao hàng</span>
+                                            <span th:case="SHIPPED" class="order-status-label green">Giao hàng thành công</span>
+                                            <span th:case="SHIPMENT_FAILED" class="order-status-label red">Giao hàng thất bại</span>
+                                        </th:block>
+                                    </div>
+                                    <div class="order-line" th:if="${orderDTO.shipmentDTO != null && orderDTO.shipmentDTO.order_code != null
+                                            && (orderDTO.status.name() == 'SHIPPING' || orderDTO.status.name() == 'CONFIRMED')}">
+                                        <div id="print-order-btn" class="label" style="color: blue;cursor: pointer;">In vận đơn</div>
+                                    </div>
+                                </div>
+                                <div class="order-box">
+                                    <div class="order-title">Người nhận</div>
+                                    <div class="order-line">
+                                        <div class="label">Họ tên:</div>
+                                        <div class="text" th:text="${orderDTO.shipmentDTO.name}"></div>
+                                    </div>
+                                    <div class="order-line">
+                                        <div class="label">Điện thoại:</div>
+                                        <div class="text" th:text="${orderDTO.shipmentDTO.phone}"></div>
+                                    </div>
+                                    <div class="order-line">
+                                        <div class="label">Địa chỉ:</div>
+                                        <div class="text" th:text="${orderDTO.shipmentDTO.address+', '+orderDTO.shipmentDTO.ward_name+', '+orderDTO.shipmentDTO.district_name+', '+orderDTO.shipmentDTO.city_name}"></div>
+                                    </div>
+                                </div>
+                                <div class="order-box">
+                                    <div class="order-title">Tài khoản đặt hàng</div>
+                                    <div class="order-line">
+                                        <div class="label">Email:</div>
+                                        <div class="text" th:text="${email}"></div>
+                                    </div>
+                                    <div class="order-line">
+                                        <div class="label">Trạng thái</div>
+                                        <th:block th:switch="${emailStatus}">
+                                            <input hidden id="isAccountEnable" th:value="${emailStatus}">
+                                            <div class="order-status-label green" th:case="1">Kích hoạt</div>
+                                            <div class="order-status-label red" th:case="0">Tài khoản bị khóa</div>
+                                        </th:block>
+                                    </div>
+                                </div>
+                                <div class="order-box">
+                                    <div class="order-title">Thanh toán</div>
+                                    <div class="order-line">
+                                        <div class="label">Phương thức:</div>
+                                        <div class="text" th:if="${orderDTO.paymentDTO == null}" style="color: red;">Chưa thanh toán</div>
+                                        <div class="text" th:unless="${orderDTO.paymentDTO == null}" th:text="${orderDTO.paymentDTO.paymentMethod}"></div>
+                                    </div>
+                                    <div class="order-line" th:if="${orderDTO.paymentDTO != null}">
+                                        <div class="label">Trạng thái:</div>
+                                        <div class="text green" th:if="${orderDTO.isRefund == 0}" style="color: green;">Đã thanh toán</div>
+                                        <div class="text green" th:if="${orderDTO.isRefund == 1}" style="color: green;">Đã hoàn tiền</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper border-box">
+                        <h3 class="title-sub">Thông tin sản phẩm</h3>
+                        <table class="table-p">
+                            <thead>
+                                <tr>
+                                    <td>Tên sản phẩm</td>
+                                    <td>Giá</td>
+                                    <td>Số lượng</td>
+                                    <td>Tạm tính</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="orderDetailDTO : ${orderDTO.orderDetailDTOs}">
+                                    <td>
+                                        <div class="table-p__box">
+                                            <div class="table-p__img-wrap">
+                                                <img class="u-img-fluid" th:src="${orderDetailDTO.productDTO.thumbnail}"
+                                                    alt="">
+                                            </div>
+                                            <div class="table-p__info">
+                                                <span class="table-p__name">
+                                                    <a th:href="@{/product/admin/{id}(id=${orderDetailDTO.productDTO.id})}"
+                                                        th:text="${orderDetailDTO.productDTO.name}"></a></span>
+                                                <span class="table-p__category">
+                                                    <a th:href="@{'/product?type=' + ${orderDetailDTO.productDTO.type}}"
+                                                        th:text="${orderDetailDTO.productDTO.type}"></a></span>
+                                                <ul class="table-p__variant-list"
+                                                    th:if="${orderDetailDTO.skuDTO.variantValueDTO != null}">
+                                                    <li
+                                                        th:each="variant : ${orderDetailDTO.skuDTO.variantValueDTO}">
+                                                        <span th:text="${variant.variant_name + ':'}"> </span>
+                                                        <span th:text="${variant.variant_value}"></span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="table-p__price" style="text-align: right;"
+                                            th:text="${#numbers.formatDecimal(orderDetailDTO.skuDTO.price, 0,'POINT',0, 'POINT')+ ' ₫'  }">$125.00</span>
+                                    </td>
+                                    <td>
+                                        <span class="table-p__price"
+                                            th:text="${orderDetailDTO.quantity}"></span>
+                                        <span class="table-p__price" th:text="${'Kho hàng: ' + orderDetailDTO.skuDTO.quantity}"></span>
+                                        <span th:if="${orderDetailDTO.skuDTO.quantity < orderDetailDTO.quantity}" class="quantity-invalid table-p__price">Sản phẩm không đủ hàng</span>
+                                    </td>
+                                    <td>
+                                        <span class="table-p__price" style="text-align: right;"
+                                            th:text="${#numbers.formatDecimal(orderDetailDTO.skuDTO.price * orderDetailDTO.quantity, 0,'POINT',0, 'POINT')+ ' ₫'  }"></span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style="display: flex;justify-content: right;">
+                            <div class="col-md-6 u-s-m-b-30" style="max-width: 400px;">
+                                <div class="f-cart__pad-box">
+                                    <div class="u-s-m-b-30">
+                                        <table class="f-cart__table">
+                                            <tbody>
+                                                <tr>
+                                                    <td>Tạm tính</td>
+                                                    <td id="sub-total"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Phí vận chuyển</td>
+                                                    <td id="ship-fee"
+                                                        th:text="${#numbers.formatDecimal(orderDTO.shipmentDTO.ship_fee, 0,'POINT',0, 'POINT')+ ' ₫'  }">
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Tổng cộng</td>
+                                                    <td id="total-price"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div>
+                                    
+                                </div>
+                                <th:block th:if="${orderDTO.status.name() != 'SHIPPED' && orderDTO.status.name() != 'UNPAID' && orderDTO.status.name() != 'CANCELED' && orderDTO.status.name() != 'REJECTED' && orderDTO.status.name() != 'SHIPMENT_FAILED'}">
+                                    <button th:if="${orderDTO.status.name() == 'PROCESSING'}"  type="button" class="btn btn--e-brand-b-2 btn-fix" onclick="checkOrderQuantity()">XÁC NHẬN ĐƠN HÀNG</button>
+                                    <button th:if="${orderDTO.status.name() == 'CONFIRMED'}" type="button" class="btn btn--e-brand-b-2 btn-fix" onclick="confirmShippingOrder()">ĐANG GIAO HÀNG</button>
+                                    <button th:if="${orderDTO.status.name() == 'SHIPPING'}" type="button" class="btn btn--e-brand-b-2 btn-fix" onclick="confirmShippedOrder()">GIAO HÀNG THÀNH CÔNG</button>
+                                    <button th:if="${orderDTO.status.name() == 'SHIPPING'}" type="button" class="btn btn--e-transparent-brand-b-2 btn-fix" onclick="confirmOrderFailed()">GIAO HÀNG THẤT BẠI</button>
+                                    <button class="btn btn--e-transparent-brand-b-2 btn-fix" onclick="confirmRejectOrder()">HỦY ĐƠN HÀNG</button>
+                                </th:block>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="modal-not-enough-quantity" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle" style="color: black;">Cảnh báo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="order-accept-submit-btn" hidden class="btn btn-primary">Xác nhận</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                </div>
+            </div>
+            </div>
+        </div>
+        <script src="js/jsscript.js"></script>
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                var subtotal = 0;
+                var ship_fee = $('#ship-fee').text().replaceAll('.', '').replace(' ₫', '');
+                $('.table-p > tbody > tr').each(function () {
+                    subtotal += +$(this).find('td').eq(3).find('.table-p__price').text().replaceAll('.', '').replace(' ₫', '');
+                })
+                $('#sub-total').text(numberWithCommas(subtotal) + ' ₫');
+                $('#total-price').text(numberWithCommas(+ship_fee + +subtotal) + ' ₫');
+            });
+            
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                    $(this).remove();
+                });
+            }, 4000);
+
+            var orderCode = /*[[${orderDTO.shipmentDTO.order_code}]]*/ '';
+            $('#print-order-btn').on('click', function(){
+                printOrder(orderCode);
+            })
+
+        </script>
+    </body>
+</html>

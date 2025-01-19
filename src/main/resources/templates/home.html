@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>Trang chủ</title>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/utility.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .btn--e-brand:hover {
+            color: white;
+        }
+
+        .block__title {
+            font-size: 20px;
+        }
+
+        .product-m {
+            box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .product-m__thumb {
+            padding-top: 10px;
+        }
+
+        #map {
+            height: 900px
+        }
+    </style>
+</head>
+
+<body>
+    <!--====== Header ======-->
+    <header th:replace="/header/header-guest :: header"> </header>
+    <div id="map"></div>
+
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg&callback=initMap&v=weekly"
+        defer>
+
+
+        </script>
+    <script>
+        var locations = {
+            "feed1": [
+                [25.774252, -80.190262],
+                [18.466465, -66.118292],
+                [32.321384, -64.75737]
+            ],
+            "feed2": [
+                [32.321384, -64.75737],
+                [36.321384, -88.75737]
+            ],
+            "feed3": [
+                [20.466465, -68.118292],
+                [34.321384, -66.75737],
+                [27.774252, -82.190262]
+            ]
+        };
+
+        function MVCArrayBinder(mvcArray) {
+            this.array_ = mvcArray;
+        }
+        $(document).ready(function () {
+            MVCArrayBinder.prototype = new google.maps.MVCObject();
+            MVCArrayBinder.prototype.get = function (key) {
+                if (!isNaN(parseInt(key))) {
+                    return this.array_.getAt(parseInt(key));
+                } else {
+                    this.array_.get(key);
+                }
+            }
+            MVCArrayBinder.prototype.set = function (key, val) {
+                if (!isNaN(parseInt(key))) {
+                    this.array_.setAt(parseInt(key), val);
+                } else {
+                    this.array_.set(key, val);
+                }
+            }
+            google.maps.event.addDomListener(window, "load", initMap);
+        })
+
+        function marFunc(event) {
+            var path = poly.getPath();
+
+            path.push(event.latLng);
+            var len = path.getLength();
+            var marker = new google.maps.Marker({
+                position: event.latLng,
+                map: map,
+                draggable: true
+            });
+            var bind = poly.binder
+            var temp = (len - 1).toString()
+            console.log(temp)
+            marker.bindTo('position', bind, temp);
+        }
+
+        var poly;
+        var map;
+
+        function initMap() {
+            var polyOptions = {
+                strokeColor: '#000000',
+                strokeOpacity: 1.0,
+                strokeWeight: 3,
+                map: map
+            };
+            poly = new google.maps.Polyline(polyOptions);
+
+            var bounds = new google.maps.LatLngBounds();
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: new google.maps.LatLng(25.774252, -80.190262),
+                zoom: 10,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            });
+
+            poly.binder = new MVCArrayBinder(poly.getPath());
+            for (var i in locations) {
+                for (j in locations[i]) {
+                    var evt = {};
+                    evt.latLng = new google.maps.LatLng(locations[i][j][0], locations[i][j][1]);
+                    bounds.extend(evt.latLng);
+                    marFunc(evt);
+                }
+            }
+            poly.setMap(map);
+            map.fitBounds(bounds);
+            console.log(poly.binder.array_.g[0])
+        }
+
+    </script>
+
+    <!--<iframe
+        width="100%"
+        height="900"
+        style="border:0"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps/embed/v1/place?key=AIzaSyC4LoJPV7i8pUQ9Z9-hMFcVq2EPOJV4sGI&q=Ha+Noi">
+    </iframe>-->
+
+    <!--====== App Content ======-->
+    <div class="app-content">
+        <!--====== Slider ======-->
+        <div class="s-skeleton s-skeleton--h-600 s-skeleton--bg-grey">
+            <div class="owl-carousel primary-style-1" id="hero-slider">
+                <div class="hero-slide hero-slide--1"
+                    style="background-image: url('../images/slider/slider-iphone.jpg');">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="slider-content slider-content--animation">
+
+                                    <span class="content-span-1 u-c-white">Sản phẩm mới</span>
+
+                                    <span class="content-span-2 u-c-white">Iphone 14 Pro Max</span>
+
+                                    <span class="content-span-4 u-c-white">Chỉ từ
+
+                                        <span class="u-c-brand">40.000.000</span></span>
+
+                                    <a class="shop-now-link btn--e-brand" href="#">MUA NGAY</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="hero-slide hero-slide--1"
+                    style="background-image: url('../images/slider/slider-samsung.jpg');">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="slider-content slider-content--animation">
+
+                                    <span class="content-span-1 u-c-secondary">Khuyến mãi mới nhất</span>
+
+                                    <span class="content-span-2 u-c-secondary">Giảm 15% </span>
+
+                                    <span class="content-span-3 u-c-secondary">Cho các sản phẩm SamSung</span>
+
+                                    <span class="content-span-4 u-c-secondary">Chỉ từ
+
+                                        <span class="u-c-brand">20.000.000</span></span>
+
+                                    <a class="shop-now-link btn--e-brand" href="#">MUA NGAY</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--====== End Slider ======-->
+        <!--====== Section New Product ======-->
+        <div class="u-s-p-y-90">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div style="margin-bottom: 25px;cursor: pointer;">
+                            <img width="100%" src="images/gdn-xiaomi-redmi-10-5g-1.png">
+                        </div>
+                        <div class="section_product">
+                            <div class="section__intro u-s-m-b-46">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="block">
+                                                <span class="block__title">SẢN PHẨM MỚI</span>
+                                                <span><a href="/product?order_by=san-pham-moi">Xem tất cả</a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row is-grid-active">
+                                <div class="col-lg-3 col-md-4 col-sm-6" th:each="newProduct : ${newProduct}">
+                                    <div class="product-m">
+                                        <div class="product-m__thumb">
+
+                                            <a class="aspect aspect--bg-grey aspect--square u-d-block"
+                                                th:href="@{/product/{id}(id=${newProduct.id})}">
+
+                                                <img class="aspect__img" th:src="${newProduct.thumbnail}" alt=""></a>
+                                        </div>
+                                        <div class="product-m__content">
+                                            <div class="product-m__category">
+
+                                                <a href="/" th:text="${newProduct.type}"
+                                                    th:href="@{'/product?type=' + ${newProduct.type}}"></a>
+                                            </div>
+                                            <div class="product-m__name">
+
+                                                <a href="/" th:text="${newProduct.name}"
+                                                    th:href="@{/product/{id}(id=${newProduct.id})}"></a>
+                                            </div>
+                                            <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i
+                                                    class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i
+                                                    class="far fa-star"></i><i class="far fa-star"></i>
+
+                                                <span class="product-m__review">(23)</span>
+                                            </div>
+                                            <div class="product-m__price" th:text="${newProduct.price}"
+                                                style="color: #ff4500;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom: 25px;cursor: pointer;">
+                            <img width="100%" src="images/tab-a8-1200x200.png">
+                        </div>
+                        <div class="section_product">
+                            <div class="section__intro u-s-m-b-46">
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="block">
+                                                <span class="block__title">SẢN PHẨM BÁN CHẠY</span>
+                                                <span><a href="/product?order_by=san-pham-ban-chay">Xem tất
+                                                        cả</a></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row is-grid-active">
+                                <div class="col-lg-3 col-md-4 col-sm-6" th:each="bestSelling : ${bestSellingProduct}">
+                                    <div class="product-m">
+                                        <div class="product-m__thumb">
+
+                                            <a class="aspect aspect--bg-grey aspect--square u-d-block"
+                                                th:href="@{/product/{id}(id=${bestSelling.id})}">
+
+                                                <img class="aspect__img" th:src="${bestSelling.thumbnail}" alt=""></a>
+                                        </div>
+                                        <div class="product-m__content">
+                                            <div class="product-m__category">
+
+                                                <a href="/" th:text="${bestSelling.type}"
+                                                    th:href="@{'/product?type=' + ${bestSelling.type}}"></a>
+                                            </div>
+                                            <div class="product-m__name">
+
+                                                <a href="/" th:text="${bestSelling.name}"
+                                                    th:href="@{/product/{id}(id=${bestSelling.id})}"></a>
+                                            </div>
+                                            <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i
+                                                    class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i
+                                                    class="far fa-star"></i><i class="far fa-star"></i>
+
+                                                <span class="product-m__review">(23)</span>
+                                            </div>
+                                            <div class="product-m__price" th:text="${bestSelling.price}"
+                                                style="color: #ff4500;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+    <footer th:replace="/footer/footer :: footer"></footer>
+    <script src="js/vendor.js"></script>
+
+    <!--====== jQuery Shopnav plugin ======-->
+    <script src="js/jquery.shopnav.js"></script>
+
+    <!--====== App ======-->
+    <script src="js/app.js"></script>
+
+</body>
+
+</html>

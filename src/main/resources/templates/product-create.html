@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>Tạo sản phẩm mới</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/7bf2db2eec.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        body{
+            background-color: #f6f6f6;
+        }
+        .ck-editor__editable {
+            min-height: 200px !important;
+        }
+        input[type='file']{
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            position: absolute;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex;">
+        <!-- Navbar -->
+        <div  th:replace="/header/navbar-admin :: navbar-admin"></div>
+        <!-- Page Content -->
+        <div id="page-content-wrapper" style="position: relative;">
+            <div class="container">
+                <div class="wrapper border-box">
+                    <ul class="breadcrumb__list">
+                        <li class="has-separator">
+                            <a href="/admin">Trang chủ</a>
+                        </li>
+                        <li class="has-separator">
+                            <a href="/product/admin">Quản lý sản phẩm</a>
+                        </li>
+                        <li class="is-marked">
+                            <a href="/product/create">Thêm sản phẩm</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div th:if="${message}" th:text="${message}" class="alert alert-danger" style="position: absolute;z-index: 1;top: 10px;left: 15px;right: 15px;" ></div>
+            <form id="create-product-form" method="post" th:action="@{/product/create}" th:object="${productDTO}" enctype="multipart/form-data">
+                <div class="container" style="position: relative;">
+                    <div class="wrapper border-box">
+                        <h3 class="title-sub">Thông tin cơ bản</h3>
+                        <div class="form-line">
+                            <span class="label">Ảnh bìa</span>
+                            <div>
+                                <input type="file" id="thumbnail-add-btn" onchange="addThumbnail(event)" accept="image/*" name="thumbnail_file">
+                                <div class="thumbnail-add-btn">
+                                    <i class="fa-solid fa-file-circle-plus"></i>
+                                    <span>Chọn ảnh bìa</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <span class="label">Hình ảnh sản phẩm</span>
+                            <div>
+                                <div>
+                                    <input type="file" id="add-image-btn" accept="image/*">
+                                    <div class="img-add-btn">
+                                        <i class="fa-solid fa-file-circle-plus"></i>
+                                        <span>Thêm hình ảnh (0/9)</span>
+                                    </div>
+                                </div>
+                                <div id="img-box" style="display: flex;min-height: 100px;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <span class="label">Tên sản phẩm</span>
+                            <div class="input-mess-box">
+                                <input class="form-control" th:field="*{name}" required>
+                                <span class="validate-message"></span>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Ngành hàng</span>
+                                <div class="input-mess-box">
+                                    <select class="custom-select default-opt"  th:field="*{type}" required>
+                                        <option value="SmartPhone">SmartPhone</option>
+                                        <option value="Laptop">Laptop</option>
+                                        <option value="Tablet">Tablet</option>
+                                    </select>
+                                    <span class="validate-message"></span>
+                                </div>
+                                
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Thương hiệu</span>
+                                <div class="input-mess-box">
+                                    <select class="custom-select default-opt" th:field="*{brand}" required>
+                                        <option value="SamSung">SamSung</option>
+                                        <option value="Apple">Apple</option>
+                                        <option value="Oppo">Oppo</option>
+                                        <option value="Huawei">Huawei</option>
+                                        <option value="Xiaomi">Xiaomi</option>
+                                        <option value="Asus">Asus</option>
+                                        <option value="LG">LG</option>
+                                        <option value="MSI">MSI</option>
+                                        <option value="Acer">Acer</option>
+                                        <option value="Lenovo">Lenovo</option>
+                                    </select>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <span class="label">Mô tả sản phẩm</span>
+                            <textarea id="editor" class="form-control" style="height: 200px;" th:field="*{description}" ></textarea>
+                        </div>
+                    </div>
+                    <div class="wrapper border-box">
+                        <span class="title-sub">Thông tin chi tiết</span>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Dung lượng lưu trữ</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" th:field="*{storage}">
+                                        <input name="temp_storage" list="storage-data" onchange="alter_input(this)" min="1"  class="form-control"  type="number" required>
+                                        <datalist  id="storage-data">
+                                            <option value="16">16</option>
+                                            <option value="32">32</option>
+                                            <option value="64">64</option>
+                                            <option value="128">128</option>
+                                            <option value="256">256</option>
+                                            <option value="512">512</option>
+                                            <option value="1">1</option>
+                                        </datalist>
+                                        <select class="custom-select" onchange="alter_input(this)">
+                                            <option value="GB">GB</option>
+                                            <option value="TB">TB</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span> 
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Dung lượng pin</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" th:field="*{battery}">
+                                        <input name="temp_battery" class="form-control" onchange="alter_input(this)"  type="number" min="1" required>
+                                        <select class="custom-select" onchange="alter_input(this)">
+                                            <option value="mAh">mAh</option>
+                                            <option value="cell">cell</option>
+                                            <option value="wh">wh</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">RAM</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" th:field="*{ram}">
+                                        <input name="temp_ram" class="form-control" onchange="alter_input(this)" list="ram-data" type="number" min="1" required>
+                                        <select class="custom-select" >
+                                            <option value="GB">GB</option>
+                                        </select>
+                                        <datalist id="ram-data">
+                                            <option value="4">4</option>
+                                            <option value="8">8</option>
+                                            <option value="16">16</option>
+                                            <option value="32">32</option>
+                                            <option value="64">64</option>
+                                        </datalist>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Vi xử lý</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input list="cpu-data" th:field="*{cpu}" class="form-control" type="text" required>
+                                        <datalist id="cpu-data">
+                                            <option>Apple A13 Bionic</option>
+                                            <option>Snapdragon 865</option>
+                                            <option>Exynos 990</option>
+                                            <option>Exynos 7885</option>
+                                            <option>Snapdragon 855</option>
+                                            <option>Apple A12 Bionic</option>
+                                        </datalist>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Hệ điều hành</span>
+                                <div class="input-mess-box" >
+                                    <div style="display: flex;">
+                                        <select class="custom-select default-opt" default-opt th:field="*{operating_system}" required >
+                                            <option value="Windows">Windows</option>
+                                            <option value="Mac OS">Mac OS</option>
+                                            <option value="Linux">Linux</option>
+                                            <option value="Android">Android</option>
+                                            <option value="iOS">iOS</option>
+                                            <option value="Chrome OS">Chrome OS</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Kích thước màn hình</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" th:field="*{screen_size}">
+                                        <input name="c" class="form-control" onchange="alter_input(this)" list="screen-size-data" step="0.1" type="number" min="1" required>
+                                        <select class="custom-select" onchange="alter_input(this)">
+                                            <option value="inches">inches</option>
+                                        </select>
+                                        <datalist id="screen-size-data">
+                                            <option value="5.5">5.5</option>
+                                            <option value="5.8">5.8</option>
+                                            <option value="6">6</option>
+                                            <option value="14">14</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                        </datalist>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Độ phân giải màn hình</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <select class="custom-select default-opt" th:field="*{screen_reslution}" required>
+                                            <option value="Full HD (1920x1080)">Full HD (1920x1080)</option>
+                                            <option value="WUXGA (1920x1200)">WUXGA (1920x1200)</option>
+                                            <option value="UWHD (2560x1080)">UWHD (2560x1080)</option>
+                                            <option value="2K QHD (2560x1440)">2K QHD (2560x1440)</option>
+                                            <option value="WQHD (3440x1440)">WQHD (3440x1440)</option>
+                                            <option value="4K (3840x2160)">4K (3840x2160)</option>
+                                            <option value="Apple XDR (6016 x 3384)">Apple XDR (6016 x 3384)</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Trọng lượng</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" th:field="*{weight}">
+                                        <input name="temp_weight" class="form-control" onchange="alter_input(this)"  type="number" min="1" step="0.1" required>
+                                        <select class="custom-select" onchange="alter_input(this)">
+                                            <option value="g">g</option>
+                                            <option value="kg">kg</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper border-box">
+                        <h3 class="title-sub">Thông tin kho hàng</h3>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Phân loại hàng</span>
+                                <div class="var-add-btn" onclick="createVarInput(this)">
+                                    <i class="fa-solid fa-plus"></i>
+                                    <span>Thêm nhóm phân loại</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="no-variant-input-box">
+                            <div class="form-line">
+                                <div class="input-box-half">
+                                    <span class="label">Giá bán (₫)</span>
+                                    <div class="input-mess-box">
+                                        <div style="display: flex;">
+                                            <input class="form-control" th:field="*{skuDTO[0].price}" type="number" min="1000" required >
+                                        </div>
+                                        <span class="validate-message"></span>
+                                    </div>
+                                </div>
+                                <div class="input-box-half">
+                                    <span class="label">Kho hàng</span>
+                                    <div class="input-mess-box">
+                                        <div style="display: flex;">
+                                            <input class="form-control" th:field="*{skuDTO[0].quantity}" type="number" min="0" required>
+                                        </div>
+                                        <span class="validate-message"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <input id="variant-counter" type="hidden" value="0">
+                    </div>
+                    <div class="wrapper border-box" style="text-align: right;position: sticky;bottom: 0;margin-bottom: 15px;">
+                        <a href="/product/admin"><button type="button" class="btn btn--e-transparent-brand-b-2">Hủy</button></a>
+                        <button id="btn-submit" class="btn btn--e-brand-b-2" >Lưu sản phẩm</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="js/ckeditor.js"></script>
+    <script src="js/jsscript.js"></script>
+    <script>
+        $.validator.messages.required = 'Không được để trống';
+        $.validator.messages.number = "Chỉ được nhập số";
+        $.validator.messages.min = "Giá trị tối thiểu là {0}"
+        
+        // set time out for notify
+        window.setTimeout(function() {
+            $(".alert.alert-danger").fadeTo(500, 0).slideUp(500, function(){
+                $(this).remove(); 
+            });
+        }, 4000);
+    </script>
+    <script>
+        ClassicEditor.create(document.querySelector('#editor'), {
+            image: {
+                resizeUnit: 'px',
+                resizeOptions: [
+                {
+                    name: 'resizeImage:75',
+                    value: '600',
+                    icon: 'large'
+                },
+                {
+                    name: 'resizeImage:original',
+                    value: null,
+                    icon: 'original'
+                },
+                {
+                    name: 'resizeImage:50',
+                    value: '350',
+                    icon: 'medium'
+                }
+                
+            ],
+            toolbar: [
+                'resizeImage:50',
+                'resizeImage:75',
+                'resizeImage:original',
+                'imageTextAlternative',
+                'toggleImageCaption',
+                'imageStyle:inline',
+                'imageStyle:block',
+                'imageStyle:side'
+            ]}
+        })
+            .then()
+            .catch(error => {
+                console.log(error.stack);
+            });
+    </script>
+   
+</body>
+
+</html>

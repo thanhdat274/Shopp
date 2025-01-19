@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>Quản lý tài khoản</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="https://kit.fontawesome.com/7bf2db2eec.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            background-color: #f6f6f6;
+        }
+
+        .fa-lock {
+            color: red;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .fa-lock-open {
+            color: green;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .icon-wrap {
+            height: 30px;
+            line-height: 30px;
+            width: 30px;
+            text-align: center;
+            margin: 0 2px;
+        }
+
+        .btn-lock,
+        .btn-unlock,
+        .btn-lock:focus,
+        .btn-unlock:focus {
+            border: none;
+            background-color: white;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex;">
+        <!-- Navbar -->
+        <div  th:replace="/header/navbar-admin :: navbar-admin"></div>
+        <!-- Page Content -->
+        <div id="page-content-wrapper" style="position: relative;">
+            <div id="notify" class="alert" style="position: absolute;top: 20px;height: 50px;left: 15px;right: 15px;">
+            </div>
+            <div class="container">
+                <div class="wrapper border-box">
+                    <ul class="breadcrumb__list">
+                        <li class="has-separator">
+                            <a href="/admin">Trang chủ</a>
+                        </li>
+                        <li class="is-marked">
+                            <a href="/product/create">Quản lý tài khoản</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container">
+                <div class="wrapper border-box">
+                    <form method="get" action="/account/all">
+                        <div style="display: flex;position: relative;max-width: 300px;margin-bottom: 15px;">
+                            <input class="form-control" value="" name="keyword"
+                                placeholder="Nhập email, họ tên người dùng" style="padding-right: 30px;">
+                            <button class="btn btn--icon fas fa-search" type="submit"
+                                style="font-size: 18px;position: absolute;height: 100%;right: 8px;top: -2px; "
+                                aria-hidden="true"></button>
+                        </div>
+                    </form>
+                    <table class="table table-bordered ">
+                        <thead class="thead-dark">
+                            <tr style="text-align: center;">
+                                <th>ID</th>
+                                <th style="width: 220px;">Email</th>
+                                <th style="width: 180px;">Họ tên</th>
+                                <th>Ngày tạo</th>
+                                <th style="width: 140px;">Trạng thái</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:unless="${accountDTOs.hasContent()}">
+                                <td colspan="6" style="text-align: center;color: #fa4500;font-weight: 600;">
+                                    Không tìm thấy tài khoản nào</td>
+                            </tr>
+                            <tr th:unless="${#lists.isEmpty(accountDTOs)}" th:each="accountDTO :${accountDTOs}">
+                                <td th:text="${accountDTO.id}"></td>
+                                <td th:text="${accountDTO.email}"></td>
+                                <td th:text="${accountDTO.name}"></td>
+                                <td th:text="${#temporals.format(accountDTO.create_date, 'dd/MM/yyyy HH:mm')}"></td>
+                                <th:block>
+                                    <td th:if="${accountDTO.isEnable == 1}">
+                                        <span class="badge badge-success">Kích hoạt</span>
+                                    </td>
+                                    <td th:if="${accountDTO.isEnable == 0}">
+                                        <span class="badge badge-danger">Vô hiệu hóa</span>
+                                    </td>
+                                </th:block>
+                                <td>
+                                    <div style="display: flex;justify-content: center;">
+                                        <div class="icon-wrap">
+                                            <form th:id="${accountDTO.id}" th:if="${accountDTO.isEnable == 1}"
+                                                method="post" th:action="@{/account/disable}">
+                                                <input type="hidden" th:value="${accountDTO.email}" name="email">
+                                                <button type="button" class="btn-lock"><i class="fa-solid fa-lock"
+                                                        title="Khóa tài khoản"></i></button>
+                                            </form>
+                                            <form th:id="${accountDTO.id}" th:if="${accountDTO.isEnable == 0}" method=post
+                                                th:action="@{/account/enable}">
+                                                <input type="hidden" th:value="${accountDTO.email}" name="email">
+                                                <button type="button" class="btn-unlock"><i
+                                                        class="fa-solid fa-lock-open"
+                                                        title="Mở khóa tài khoản"></i></button>
+                                            </form>
+                                        </div>
+                                        <!-- <div class="icon-wrap">
+                                                <a href="/">
+                                                    <i class="fa-solid fa-circle-info" style="font-size: 20px;cursor: pointer;" title="Xem chi tiểt"></i>
+                                                </a>
+                                            </div> -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <!-- Modal -->
+                    <div class="modal fade" id="modalConfirm" tabindex="-1" role="dialog"
+                        aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content">
+                                <input type="hidden" id="hidden-form-id">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLongTitle" style="color: black;">Xác nhận</h5>
+                                    <button type="button" class="close modal-close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body" style="color: black;">
+                                    
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary modal-close" data-dismiss="#modalConfirm">Hủy</button>
+                                    <button type="button" class="btn btn-primary btn-modal-confirm">Xác nhận</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Pagination -->
+                    <ul class="shop-p__pagination" th:if="${accountDTOs.totalPages gt 0}">
+                        <li th:classappend="${accountDTOs.number eq 0} ? 'disabled'">
+                            <a class="fas fa-angle-left pagination-link"
+                                th:href="@{/account/all?page={id}(id=${accountDTOs.number lt 2 ? 1 : accountDTOs.number})}"
+                                aria-label="Trang trước" title="Trang trước"></a>
+                        </li>
+                        <li th:classappend="${i eq accountDTOs.number + 1} ? 'is-active'"
+                            th:each="i : ${#numbers.sequence( 1, accountDTOs.totalPages, 1)}">
+                            <a th:href="@{/account/all?page={id}(id=${i})}" th:text="${i}" class="pagination-link"
+                                th:title="${'Trang '+ i}">1</a>
+                        </li>
+
+                        <li th:classappend="${accountDTOs.number + 1 eq accountDTOs.totalPages} ? 'disabled'">
+                            <a class="fas fa-angle-right pagination-link"
+                                th:href="@{/account/all?page={id}(id=${accountDTOs.number + 2})}" aria-label="Trang sau"
+                                title="Trang sau"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // change href attribute of pagination to keep filter parameter
+        var newURL = window.location.search;
+        const newURLParams = new URLSearchParams(newURL);
+        if (newURLParams.has('page')) {
+            newURLParams.delete('page');
+        }
+        $("a.pagination-link").each(function () {
+            var $this = $(this);
+            var _href = $this.attr("href");
+            $this.attr("href", _href + '&' + newURLParams);
+        });
+        //show notification
+        if (newURLParams.has('message')) {
+            var message = newURLParams.get('message');
+            if (message == 'success') {
+                $('#notify').text('Cập nhật trạng thái tài khoản thành công').addClass('alert-success');
+            } else {
+                $('#notify').text('Đã có lỗi xảy ra').addClass('alert-success');
+            }
+            window.setTimeout(function () {
+                $(".alert").fadeTo(500, 0).slideUp(500, function () {
+                    $(this).remove();
+                });
+            }, 4000);
+        }
+        $('.btn-lock, .btn-unlock').on('click', function(){
+            var form_id = $(this).parents('form').attr('id')
+            var email = $(this).parents('tr').children().eq(1).text()
+            $('.modal-content').children("#hidden-form-id").val(form_id)
+            $('#modalConfirm').modal('show')
+            if($(this).hasClass('btn-lock')) 
+                $('.modal-body').text("Bạn có chắc muốn khóa tài khoản '"+email+"'")
+            else 
+                $('.modal-body').text("Bạn có chắc muốn mở khóa tài khoản '"+email+"'")
+        })
+        $('.modal-close').on('click', function(){
+            $('#modalConfirm').modal('hide')
+        })
+        $('.btn-modal-confirm').on('click', function(){
+            var form_id = $('.modal-content').children("#hidden-form-id").val()
+            if($('#'+form_id).length != 0)
+                $('#'+form_id).submit();
+            else 
+                console.log("No form id found")
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Đặt hàng</title>
+        <script src="js/jquery-3.6.0.min.js"></script>
+        <link href="images/favicon.png" rel="shortcut icon">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/vendor.css">
+        <link rel="stylesheet" href="css/utility.css">
+        <link rel="stylesheet" href="css/app.css">
+        <style>
+            .o-card__img-wrap{
+                width: 80px;
+                height: 80px;
+            }
+            .checkout-f__h1{
+                font-weight: bold;
+            }
+            .gl-text{
+                color: #4a4a4a;
+            }
+            body{
+                color: #3e3e3e;
+            }
+            .btn:hover {
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <!--====== Header ======-->
+        <header th:replace="/header/header-guest :: header" th:object="${orderDTO}"> </header>
+        <div class="app-content">
+            <div class="section__content">
+                <div class="container">
+                    <div class="breadcrumb__wrap" style="margin-top: 15px;">
+                        <ul class="breadcrumb__list">
+                            <li class="has-separator">
+                                <a href="/">Trang chủ</a>
+                            </li>
+                            <li class="has-separator">
+                                <a href="/cart">Giỏ hàng</a>
+                            </li>
+                            <li class="is-marked">
+                                <a href="/order">Đặt hàng</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="u-s-p-b-60">
+                <div class="section__content">
+                    <div class="container">
+                        <div class="checkout-f">
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <h1 class="checkout-f__h1">THÔNG TIN NHẬN HÀNG</h1>
+                                    <form id="create-order-form" method="post" th:action="@{/order/create}" th:object="${orderDTO}">
+                                    <div class="checkout-f__delivery">
+                                        <div class="gl-inline">
+                                            <div class="u-s-m-b-15">
+                                                <label class="gl-label" for="billing-fname">HỌ VÀ TÊN *</label>
+                                                <input form="create-order-form" th:field="*{shipmentDTO.name}" class="input-text input-text--primary-style" type="text" required></div>
+                                            <div class="u-s-m-b-15">
+                                                <label class="gl-label" for="billing-lname">SỐ ĐIỆN THOẠI *</label>
+                                                <input class="input-text input-text--primary-style" th:field="*{shipmentDTO.phone}" type="tel" required
+                                                    pattern="[0-9]{10}"
+                                                    oninvalid="this.setCustomValidity('Số điện thoại có dạng 10 chữ số từ 0-9')"
+                                                    oninput="this.setCustomValidity('')">
+                                            </div>
+                                        </div>
+                                        <div class="u-s-m-b-15">
+                                            <label class="gl-label" for="billing-fname">EMAIL *</label>
+                                            <input class="input-text input-text--primary-style" th:field="*{shipmentDTO.email}" type="email" required></div>
+                                        <div class="gl-inline">
+                                            <div class="u-s-m-b-15">
+                                                <label class="gl-label" for="billing-fname">ĐỊA CHỈ *</label>
+                                                <input class="input-text input-text--primary-style" th:field="*{shipmentDTO.address}" type="text" required></div>
+                                            <div class="u-s-m-b-15">
+                                                <label class="gl-label" for="billing-lname">TỈNH/THÀNH PHỐ *</label>
+                                                <select id="select-box-city" th:field="*{shipmentDTO.city_id}" class="select-box select-box--primary-style"  required>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="gl-inline">
+                                            <div class="u-s-m-b-15">
+                                                <label class="gl-label" for="billing-fname">QUẬN/HUYỆN *</label>
+                                                <select id="select-box-district" th:field="*{shipmentDTO.district_id}"   class="select-box select-box--primary-style" required>
+                                                    <!-- <option disabled selected value> -- Chọn quận/huyện -- </option> -->
+                                                </select>
+                                            </div>
+                                            <div class="u-s-m-b-15">
+                                                <label class="gl-label" for="billing-lname">PHƯỜNG/XÃ *</label>
+                                                <select id="select-box-ward" th:field="*{shipmentDTO.ward_id}" class="select-box select-box--primary-style" required  >
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="u-s-m-b-10">
+                                            <label class="gl-label" for="order-note">GHI CHÚ</label>
+                                            <textarea th:field="*{customer_note}" class="text-area text-area--primary-style" id="order-note"></textarea>
+                                        </div>
+                                        <input id="input-province-name" th:field="*{shipmentDTO.city_name}" hidden> 
+                                        <input id="input-district-name" th:field="*{shipmentDTO.district_name}"  hidden> 
+                                        <input id="input-ward-name" th:field="*{shipmentDTO.ward_name}"  hidden> 
+                                    </div>
+                                    </form>
+                                </div>
+                                <div class="col-lg-6">
+                                    <h1 class="checkout-f__h1">SẢN PHẨM</h1>
+                                    <div class="o-summary">
+                                        <div class="o-summary__section u-s-m-b-30">
+                                            <div class="o-summary__item-wrap gl-scroll">
+                                                <div class="o-card" th:each="cartDetail, stat : ${cartDTO.cartDetailDTOs}" style="border-color: #a5a5a5;">
+                                                    <div class="o-card__flex">
+                                                        <div class="o-card__img-wrap">
+                                                            <img class="u-img-fluid" th:src="${cartDetail.productDTO.thumbnail}" alt=""></div>
+                                                        <div class="o-card__info-wrap">
+                                                            <span class="o-card__name">
+                                                                <a th:href="@{/product/{id}(id=${cartDetail.productDTO.id})}" th:text="${cartDetail.productDTO.name}"></a>
+                                                            </span>
+                                                            <div style="display: flex;">
+                                                                <span class="o-card__price" th:text="${#numbers.formatDecimal(cartDetail.skuDTO.price, 0,'POINT',  0, 'POINT') + ' ₫' }"></span>
+                                                                <span class="o-card__quantity2 o-card__quantity " th:text="${'x '+cartDetail.quantity}" style="margin-left: 4px;"> x 1</span>
+                                                            </div>
+                                                            
+                                                            <span class="o-card__quantity" th:each="variant : ${cartDetail.skuDTO.variantValueDTO}"
+                                                                th:text="${variant.variant_name + ': ' + variant.variant_value}"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="o-summary__section u-s-m-b-30">
+                                            <div class="o-summary__box">
+                                                <div class="ship-b">
+                                                    <div class="ship-b__box">
+                                                        <span class="ship-b__text">Nhận hàng vào: </span>
+                                                        <span id="delivery-time"  style="font-size: 14px;font-weight: 600;color: #333333;"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="o-summary__section u-s-m-b-30">
+                                            <div class="o-summary__box">
+                                                <table class="o-summary__table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>GIÁ TRỊ ĐƠN HÀNG</td>
+                                                            <td id="total-product-price"></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>PHÍ VẬN CHUYỂN</td>
+                                                            <td id="ship-fee">0 ₫</td>
+                                                        </tr>                                
+                                                        <tr>
+                                                            <td>TỔNG CỘNG</td>
+                                                            <td id="total-order-price"></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="o-summary__section u-s-m-b-30">
+                                            <div class="o-summary__box">
+                                                <h1 class="checkout-f__h1">PHƯƠNG THỨC THANH TOÁN</h1>
+                                                <div class="checkout-f__payment">
+                                                    <div class="u-s-m-b-10">
+                                                        <div class="radio-box">
+                                                            <input form="create-order-form" type="radio" name="payment_method" value="VNPAY" required>
+                                                            <div class="radio-box__state radio-box__state--primary">
+                                                                <label class="radio-box__label" for="cash-on-delivery">Thanh toán VnPay</label>
+                                                            </div>
+                                                        </div>
+                                                        <span class="gl-text u-s-m-t-6">Thanh toán qua ví điện tử VnPay</span>
+                                                    </div>
+                                                    <div class="u-s-m-b-10">
+                                                        <div class="radio-box">
+                                                            <input form="create-order-form" type="radio" name="payment_method" value="MOMO" required>
+                                                            <div class="radio-box__state radio-box__state--primary">
+                                                                <label class="radio-box__label" for="cash-on-delivery">Thanh toán Momo</label>
+                                                            </div>
+                                                        </div>
+                                                        <span class="gl-text u-s-m-t-6">Thanh toán qua ví điện tử Momo</span>
+                                                    </div>
+                                                    <div>
+
+                                                        <button form="create-order-form" class="btn btn--e-brand-b-2" type="submit">ĐẶT HÀNG</button></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer th:replace="/footer/footer :: footer"></footer>
+        <script th:inline="javascript">
+        $(document).ready(function(){
+            var city_id = /*[[${orderDTO.shipmentDTO.city_id}]]*/ 'default';
+            var city_name = /*[[${orderDTO.shipmentDTO.city_name}]]*/ 'default';
+            var district_id = /*[[${orderDTO.shipmentDTO.district_id}]]*/ 'default';
+            var district_name = /*[[${orderDTO.shipmentDTO.district_name}]]*/ 'default';
+            var ward_name = /*[[${orderDTO.shipmentDTO.ward_name}]]*/ 'default';
+            var ward_code = /*[[${orderDTO.shipmentDTO.ward_id}]]*/ 'default';
+            initSelectBoxCity(city_name, district_name, ward_name);
+            calculateShipFee(district_id, ward_code);
+            getDeliveryTime(district_id, ward_code);
+        });
+            
+        </script>
+    <script src="js/vendor.js"></script>
+    <script src="js/jquery.shopnav.js"></script>
+    <script src="js/jsscript.js"></script> 
+    </body>
+</html>

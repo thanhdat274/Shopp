@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Danh sách sản phẩm</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/utility.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+    a:hover {
+        color: white;
+    }
+    .btn:hover {
+        color: white;
+    }
+    .btn:focus{
+        box-shadow: none;
+    }
+    button:focus-visible, i,button:focus{
+        outline: none;
+        box-shadow: none;
+    }
+    button{
+        background: transparent;
+        border: none !important;
+        font-size:0;
+    }
+    .table-p__variant-list > li > span, .table-p__category > a {
+        color: #323232;
+    }
+    .table-p tr, .table-p {
+        border-color: #a5a5a5;
+    }
+    </style>
+</head>
+
+<body>
+    <!--====== Header ======-->
+    <header th:replace="/header/header-guest :: header"> </header>
+    <div class="app-content">
+        <div class="section__content">
+            <div class="container">
+                <div class="breadcrumb__wrap" style="margin-top: 15px;">
+                    <ul class="breadcrumb__list">
+                        <li class="has-separator">
+                            <a href="/">Trang chủ</a>
+                        </li>
+                        <li class="is-marked">
+                            <a href="/cart">Giỏ hàng</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="u-s-p-b-60" th:if="${ #lists.size(cartDTO.cartDetailDTOs) > 0}">
+            <!--====== Section Intro ======-->
+            <div class="container" style="height: 55px;">
+                <div class="alert alert-success" style="display: none;" ></div>
+                <div class="alert alert-danger" style="display: none;"></div>
+            </div>
+            <div class="section__intro u-s-m-b-60" style="margin-bottom: 1.75rem;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="section__text-wrap">
+                                <h1 class="section__heading u-c-secondary">GIỎ HÀNG</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--====== End - Section Intro ======-->
+            <!--====== Section Content ======-->
+            <div class="section__content">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 u-s-m-b-30">
+                            <div class="table-responsive"> 
+                                <form id="form-update-cart" method="post" th:action="@{/cart/update}" th:object="${cartDTO}">
+                                    <table class="table-p" id="tbl-product-cart" >
+                                        <tbody>
+                                            <!--====== Row ======-->
+                                            <tr th:each="cartDetail, stat : ${cartDTO.cartDetailDTOs}">
+                                                <td>
+                                                    <div class="table-p__box">
+                                                        <div class="table-p__img-wrap">
+
+                                                            <img class="u-img-fluid" th:src="${cartDetail.productDTO.thumbnail}" alt=""></div>
+                                                        <div class="table-p__info">
+
+                                                            <span class="table-p__name">
+
+                                                                <a th:href="@{/product/{id}(id=${cartDetail.productDTO.id})}" th:text="${cartDetail.productDTO.name}"></a></span>
+
+                                                            <span class="table-p__category">
+
+                                                                <a th:href="@{'/product?type=' + ${cartDetail.productDTO.type}}" th:text="${cartDetail.productDTO.type}"></a></span>
+                                                            <ul class="table-p__variant-list" th:if="${cartDetail.skuDTO.variantValueDTO != null}">
+                                                                <li th:each="variant : ${cartDetail.skuDTO.variantValueDTO}">
+                                                                    <span th:text="${variant.variant_name + ':'}"> </span>
+                                                                    <span th:text="${variant.variant_value}"></span>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <span class="table-p__price"  th:text="${#numbers.formatDecimal(cartDetail.skuDTO.price, 0,  0, 'POINT') }">$125.00</span>
+                                                </td>
+                                                <td>
+                                                    <div th:text="${'Số sản phẩm còn lại: ' + cartDetail.skuDTO.quantity} " style="font-size: 13px;text-align: center;color: #323232;"></div>
+                                                    <div class="table-p__input-counter-wrap">
+                                                        <!--====== Input Counter ======-->
+                                                        <div class="input-counter">
+                                                            <span class="input-counter__minus fas fa-minus"></span>
+                                                            
+                                                            <input onchange="updateTotalPrice(this)" class="quantity_input input-counter__text input-counter--text-primary-style" 
+                                                                th:value="${cartDetail.quantity}" type="number" data-min="1" th:data-max="${cartDetail.SkuDTO.quantity}"
+                                                                th:field="${cartDTO.cartDetailDTOs[__${stat.index}__].quantity}" required>
+                                                            <input class="product_id" th:field="${cartDTO.cartDetailDTOs[__${stat.index}__].productDTO.id}" th:value="${cartDetail.productDTO.id}" hidden>
+                                                            <input class="cartDetail_id" th:field="${cartDTO.cartDetailDTOs[__${stat.index}__].id}" th:value="${cartDetail.id}" hidden>
+
+                                                            <span class="input-counter__plus fas fa-plus" ></span>
+                                                        </div>
+                                                        <!--====== End - Input Counter ======-->
+                                                    </div>
+                                                </td>
+                                                <td style="text-align: center;">
+                                                    <!-- <form  method="post" th:action="@{/cart/remove/item}"> -->
+                                                        <input class="sku_id" th:field="${cartDTO.cartDetailDTOs[__${stat.index}__].skuDTO.id}" th:value="${cartDetail.skuDTO.id}" type="hidden">
+                                                        <button class="table-p__del-wrap"  title="Xóa" type="button" onclick="removeItemFromCart(this)">
+                                                            <i class="far fa-trash-alt table-p__delete-link" ></i>
+                                                        </button>
+                                                    <!-- </form> -->
+                                                </td>
+                                            </tr>
+                                            <!--====== End - Row ======-->
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="col-lg-12">
+                            <div class="route-box">
+                                <div class="route-box__g1">
+                                    <a class="route-box__link" href="/"><i class="fas fa-long-arrow-alt-left"></i>
+                                        <span>TIẾP TỤC MUA SẮM</span></a>
+                                </div>
+                                <div class="route-box__g2">
+                                    <form id="form-delete-cart" method="post" th:action="@{/cart/remove}"></form>
+                                    <button form="form-delete-cart" class="route-box__link" ><i class="fas fa-trash"></i>
+                                        <span>XÓA TOÀN BỘ</span>
+                                    </button>
+                                    <button form="form-update-cart" class="route-box__link" ><i class="fas fa-sync"></i>
+                                        <span>CẬP NHẬT</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--====== End - Section Content ======-->
+        </div>
+        <div class="u-s-p-b-60" th:if="${ #lists.size(cartDTO.cartDetailDTOs) > 0 }">
+            <div class="section__content">
+                <div class="container">
+                    <div class="row" style="justify-content: right;">
+                        <div class="col-lg-4 col-md-6 u-s-m-b-30">
+                            <div class="f-cart__pad-box">
+                                <div class="u-s-m-b-30">
+                                    <table class="f-cart__table">
+                                        <tbody>
+                                            <tr>
+                                                <td>Số sản phẩm</td>
+                                                <td id="totalItem"></td>
+                                            </tr>
+                                            <tr>
+                                                <td>Tổng cộng</td>
+                                                <td id="total-price"></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div>
+                                    <a href="/order">
+                                        <button class="btn btn--e-brand-b-2" type="submit" style="width: 100%;padding: 10px;">ĐẶT HÀNG</button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--====== Section Empty Cart ======-->
+        <div class="col-lg-12 col-md-12 u-s-m-b-30 u-s-p-y-60" th:if="${ #lists.size(cartDTO.cartDetailDTOs) == 0 }">
+            <div class="empty">
+                <div class="empty__wrap">
+                    <span class="empty__text-1" style="font-size: 18px;">Giỏ hàng của bạn chưa có sản phẩm nào</span>
+                    <a class="empty__redirect-link btn--e-brand" href="/">TIẾP TỤC MUA SẮM</a></div>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="/footer/footer :: footer"></footer>
+    <form hidden id="form-remove-item" method="post" th:action="@{/cart/remove/item}">
+        <input id="hide-sku-id" name="sku_id">
+    </form>
+    <script>
+    $(document).ready(function(){
+        //show notification base on url param
+        cartNotify();
+        //show total price of all item
+        updateTotalPrice();
+    });
+    </script>
+    <script src="js/vendor.js"></script>
+    <script src="js/jquery.shopnav.js"></script>
+    <script src="js/jsscript.js"></script> 
+    <script src="js/script.js"></script>
+</body>
+
+</html>

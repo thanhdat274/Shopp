@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="374289014721-r1qkm5v05o9lnoj6ugqtlhq7fg0iilli.apps.googleusercontent.com">
+    <script src="https://code.jquery.com/jquery-3.7.1.js"
+        integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <title>Document</title>
+    
+</head>
+<body>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <div class="g-signin2" data-onsuccess="onSignIn">
+    </div>
+
+    <a href="https://accounts.google.com/o/oauth2/auth?scope=email&redirect_uri=http://localhost:8080/google/do&response_type=code
+    &client_id=374289014721-r1qkm5v05o9lnoj6ugqtlhq7fg0iilli.apps.googleusercontent.com&approval_prompt=force">Login With Google</a>
+
+    <div id="g_id_onload"
+     data-client_id="374289014721-r1qkm5v05o9lnoj6ugqtlhq7fg0iilli.apps.googleusercontent.com"
+     data-login_uri="http://localhost:8080/google/do"
+     data-your_own_param_1_to_login="any_value"
+     data-your_own_param_2_to_login="any_value">
+</div>
+
+<script>
+    console.log("aaaaaaaaaaaaaa")
+    function onSignIn(googleUser) {
+        var profile = googleUser.getBasicProfile();
+        console.log('ID: ' + profile.getId()); // Do not send to your backend! Use an ID token instead.
+        console.log('Name: ' + profile.getName());
+        console.log('Image URL: ' + profile.getImageUrl());
+        console.log('Email: ' + profile.getEmail()); // This is null if the 'email' scope is not present.
+        console.log("sdfsdfsdf")
+    }
+</script>
+</body>
+</html>

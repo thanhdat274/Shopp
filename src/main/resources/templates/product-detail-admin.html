@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title th:text="${productDTO.name}"></title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="https://kit.fontawesome.com/7bf2db2eec.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        body {
+            background-color: #f6f6f6;
+        }
+        td, th {
+            text-align: center;
+        }
+        .table td, .table {
+            border: 1px solid #dee2e6;
+            width: auto;
+            margin: auto;
+        }
+        .ck.ck-editor__editable_inline {
+            height: 300px !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex;">
+        <!-- Navbar -->
+        <div  th:replace="/header/navbar-admin :: navbar-admin"></div>
+        <div id="page-content-wrapper" style="position: relative;">
+            <div id="notify" class="alert" style="position: absolute;z-index: 1;top: 10px;left: 15px;right: 15px;" ></div>
+            <div class="container">
+                <div class="wrapper border-box">
+                    <ul class="breadcrumb__list">
+                        <li class="has-separator">
+                            <a href="/admin">Trang chủ</a>
+                        </li>
+                        <li class="has-separator">
+                            <a href="/product/admin">Quản lý sản phẩm</a>
+                        </li>
+                        <li class="is-marked">
+                            <a th:href="@{/product/admin/{id}(id=${productDTO.id})}" th:text="${productDTO.name}"></a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container">
+                <form method="post" id="update-product-form" th:object="${productDTO}" th:action="@{/product/update}">
+                    <input type="hidden" th:field="*{id}">
+                    <div class="wrapper border-box">
+                        <h3 class="title-sub">Thông tin sản phẩm</h3>
+                        <div class="form-line">
+                            <span class="label">Ảnh bìa</span>
+                            <div>
+                                <div class="img-wrap">
+                                    <img th:src="${productDTO.thumbnail}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <span class="label">Hình ảnh sản phẩm</span>
+                            <div id="img-box" style="display: flex;min-height: 100px;">
+                                <div class="img-wrap" th:each="image, stt : ${productDTO.imageDTO}">
+                                    <img th:src="${image.url}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <span class="label">Tên sản phẩm</span>
+                            <div class="input-mess-box">
+                                <input class="form-control" required id="name" th:field="*{name}">
+                                <span class="validate-message"></span>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Ngành hàng</span>
+                                <div class="input-mess-box">
+                                    <select class="custom-select" required="" id="type" th:field="${productDTO.type}">
+                                        <option th:value="${productDTO.type}" th:text="${productDTO.type}" selected>
+                                        </option>
+                                        <option th:if="${productDTO.type != 'SmartPhone'}" value="SmartPhone">SmartPhone
+                                        </option>
+                                        <option th:if="${productDTO.type != 'Laptop'}" value="Laptop">Laptop</option>
+                                        <option th:if="${productDTO.type != 'Tablet'}" value="Tablet">Tablet</option>
+                                    </select>
+                                    <span class="validate-message"></span>
+                                </div>
+
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Thương hiệu</span>
+                                <div class="input-mess-box">
+                                    <select class="custom-select" required="" id="brand" name="brand"
+                                        th:field="${productDTO.brand}">
+                                        <option th:value="${productDTO.brand}" th:text="${productDTO.brand}" selected></option>
+                                        <option th:if="${productDTO.brand != 'SamSung'}" value="SamSung">SamSung</option>
+                                        <option th:if="${productDTO.brand != 'Apple'}" value="Apple">Apple</option>
+                                        <option th:if="${productDTO.brand != 'Oppo'}" value="Oppo">Oppo</option>
+                                        <option th:if="${productDTO.brand != 'Huawei'}" value="Huawei">Huawei</option>
+                                        <option th:if="${productDTO.brand != 'Xiaomi'}" value="Xiaomi">Xiaomi</option>
+                                        <option th:if="${productDTO.brand != 'Asus'}" value="Asus">Asus</option>
+                                        <option th:if="${productDTO.brand != 'LG'}" value="LG">LG</option>
+                                        <option th:if="${productDTO.brand != 'MSI'}" value="MSI">MSI</option>
+                                        <option th:if="${productDTO.brand != 'Acer'}" value="Acer">Acer</option>
+                                        <option th:if="${productDTO.brand != 'Lenovo'}" value="Lenovo">Lenovo</option>
+                                    </select>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="label">Mô tả sản phẩm</span>
+                            <textarea id="editor" class="form-control" style="height: 200px;"
+                                th:field="${productDTO.description}"></textarea>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Dung lượng lưu trữ</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" id="storage" th:field="${productDTO.storage}">
+                                        <input th:value="${productDTO.storage.replaceAll('\D*','')}" name="temp_storage"
+                                            list="storage-data" onchange="alter_input(this)" min="1"
+                                            class="form-control" type="number" required="">
+                                        <datalist id="storage-data">
+                                            <option value="16">16</option>
+                                            <option value="32">32</option>
+                                            <option value="64">64</option>
+                                            <option value="128">128</option>
+                                            <option value="256">256</option>
+                                            <option value="512">512</option>
+                                            <option value="1">1</option>
+                                        </datalist>
+                                        <select class="custom-select" onchange="alter_input(this)"
+                                            th:with="storage_extention = ${productDTO.storage.replaceAll('[0-9]','')}">
+                                            <option th:value="${storage_extention}" th:text="${storage_extention}"
+                                                selected></option>
+                                            <option th:if="${storage_extention != 'GB'}" value="GB">GB</option>
+                                            <option th:if="${storage_extention != 'TB'}" value="TB">TB</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Dung lượng pin</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" id="battery" th:field="${productDTO.battery}">
+                                        <input th:value="${productDTO.battery.replaceAll('\D*','')}" name="temp_battery"
+                                            class="form-control" onchange="alter_input(this)" type="number" min="1"
+                                            required="">
+                                        <select class="custom-select" onchange="alter_input(this)"
+                                            th:with="battery_extention = ${productDTO.battery.replaceAll('[0-9]','')}">
+                                            <option th:value="${battery_extention}" th:text="${battery_extention}"
+                                                selected></option>
+                                            <option th:if="${battery_extention != 'mAh'}" value="mAh">mAh</option>
+                                            <option th:if="${battery_extention != 'cell'}" value="cell">cell</option>
+                                            <option th:if="${battery_extention != 'wh'}" value="wh">wh</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">RAM</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" id="ram" th:field="${productDTO.ram}">
+                                        <input name="temp_ram" th:value="${productDTO.ram.replaceAll('\D*','')}"
+                                            class="form-control" onchange="alter_input(this)" list="ram-data"
+                                            type="number" min="1" required="">
+                                        <select class="custom-select">
+                                            <option value="GB">GB</option>
+                                        </select>
+                                        <datalist id="ram-data">
+                                            <option value="4">4</option>
+                                            <option value="8">8</option>
+                                            <option value="16">16</option>
+                                            <option value="32">32</option>
+                                            <option value="64">64</option>
+                                        </datalist>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Vi xử lý</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input list="cpu-data" th:field=${productDTO.cpu} class="form-control"
+                                            type="text" required="" id="cpu">
+                                        <datalist id="cpu-data">
+                                            <option>Apple A13 Bionic</option>
+                                            <option>Snapdragon 865</option>
+                                            <option>Exynos 990</option>
+                                            <option>Exynos 7885</option>
+                                            <option>Snapdragon 855</option>
+                                            <option>Apple A12 Bionic</option>
+                                        </datalist>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Hệ điều hành</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <select th:field="${productDTO.operating_system}"
+                                            th:with="operating_system = ${productDTO.operating_system}"
+                                            class="custom-select " required="" id="operating_system">
+                                            <option th:value="${productDTO.operating_system}"
+                                                th:text="${productDTO.operating_system}" selected></option>
+                                            <option th:if="${productDTO.operating_system != 'Windows'}" value="Windows">
+                                                Windows</option>
+                                            <option th:if="${productDTO.operating_system != 'Mac OS'}" value="Mac OS">
+                                                Mac OS</option>
+                                            <option th:if="${productDTO.operating_system != 'Linux'}" value="Linux">
+                                                Linux</option>
+                                            <option th:if="${productDTO.operating_system != 'Android'}" value="Android">
+                                                Android</option>
+                                            <option th:if="${productDTO.operating_system != 'iOS'}" value="iOS">iOS
+                                            </option>
+                                            <option th:if="${productDTO.operating_system != 'Chrome OS'}"
+                                                value="Chrome OS">Chrome OS</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Kích thước màn hình</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input type="hidden" id="screen_size" th:field="${productDTO.screen_size}">
+                                        <input th:value="${productDTO.screen_size.replaceAll('\D*','')}"
+                                            class="form-control" onchange="alter_input(this)" list="screen-size-data"
+                                            step="0.1" type="number" min="1" required="">
+                                        <select class="custom-select" onchange="alter_input(this)">
+                                            <option value="inches">inches</option>
+                                        </select>
+                                        <datalist id="screen-size-data">
+                                            <option value="5.5">5.5</option>
+                                            <option value="5.8">5.8</option>
+                                            <option value="6">6</option>
+                                            <option value="14">14</option>
+                                            <option value="16">16</option>
+                                            <option value="17">17</option>
+                                        </datalist>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-line">
+                            <div class="input-box-half">
+                                <span class="label">Độ phân giải màn hình</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <select th:field="${productDTO.screen_reslution}"
+                                            th:with="screen_reslution = ${productDTO.screen_reslution}"
+                                            class="custom-select" required="" id="screen_reslution">
+                                            <option th:value="${screen_reslution}" th:text="${screen_reslution}"
+                                                selected></option>
+                                            <option th:if="${screen_reslution != 'Full HD (1920x1080)'}"
+                                                value="Full HD (1920x1080)">Full HD (1920x1080)</option>
+                                            <option th:if="${screen_reslution != 'WUXGA (1920x1200)'}"
+                                                value="WUXGA (1920x1200)">WUXGA (1920x1200)</option>
+                                            <option th:if="${screen_reslution != 'UWHD (2560x1080)'}"
+                                                value="UWHD (2560x1080)">UWHD (2560x1080)</option>
+                                            <option th:if="${screen_reslution != '2K QHD (2560x1440)'}"
+                                                value="2K QHD (2560x1440)">2K QHD (2560x1440)</option>
+                                            <option th:if="${screen_reslution != 'WQHD (3440x1440)'}"
+                                                value="WQHD (3440x1440)">WQHD (3440x1440)</option>
+                                            <option th:if="${screen_reslution != '4K (3840x2160)'}"
+                                                value="4K (3840x2160)">4K (3840x2160)</option>
+                                            <option th:if="${screen_reslution != 'Apple XDR (6016 x 3384)'}"
+                                                value="Apple XDR (6016 x 3384)">Apple XDR (6016 x 3384)</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                            <div class="input-box-half">
+                                <span class="label">Trọng lượng</span>
+                                <div class="input-mess-box">
+                                    <div style="display: flex;">
+                                        <input th:field="${productDTO.weight}" type="hidden" id="weight" name="weight"
+                                            value="">
+                                        <input th:value="${productDTO.weight.replaceAll('\D*','')}" name="temp_weight"
+                                            class="form-control" onchange="alter_input(this)" type="number" min="1"
+                                            step="0.1" required="">
+                                        <select th:with="weight_extention = ${productDTO.weight.replaceAll('[0-9]','')}"
+                                            class="custom-select" onchange="alter_input(this)">
+                                            <option th:value="${weight_extention}" th:text="${weight_extention}"
+                                                selected></option>
+                                            <option th:if="${weight_extention != 'g'}" value="g">g</option>
+                                            <option th:if="${weight_extention != 'kg'}" value="kg">kg</option>
+                                        </select>
+                                    </div>
+                                    <span class="validate-message"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wrapper border-box">
+                        <h3 class="title-sub">Thông tin kho hàng</h3>
+                        <div th:if="${#lists.size(productDTO.skuDTO) == 1 && #lists.size(productDTO.variantDTO) == 0}">
+                            <input hidden name="skuDTO0.id" th:field="${productDTO.skuDTO[0].id}">
+                            <div class="form-line">
+                                <div class="input-box-half">
+                                    <span class="label">Giá bán (₫)</span>
+                                    <input class="form-control" name="skuDTO[0].price"
+                                        th:value="${#numbers.formatDecimal(productDTO.skuDTO[0].price, 0, 0, 'POINT')}"
+                                        type="number" min="1000" required>
+                                </div>
+                                <div class="input-box-half">
+                                    <span class="label">Kho hàng</span>
+                                    <input class="form-control" th:field="${productDTO.skuDTO[0].quantity}"
+                                        type="number" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${#lists.size(productDTO.variantDTO) >= 1}">
+                            <table class="table">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th:block th:each="variant : ${productDTO.variantDTO}">
+                                            <th th:text="${variant.name}" style="width: 150px;"></th>
+                                        </th:block>
+                                        <th>Giá bán</th>
+                                        <th>Kho hàng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <th:block th:each="sku, stt : ${productDTO.SkuDTO}">
+                                        <tr>
+                                            <input type="hidden" th:field="*{SkuDTO[__${stt.index}__].id}">
+                                            <th:block th:each="variantValue : ${sku.variantValueDTO}">
+                                                <td th:text="${variantValue.variant_value}"
+                                                    style="vertical-align:middle"></td>
+                                            </th:block>
+                                            <td>
+                                                <input hidden class="form-control hidden_price"
+                                                    th:name="SkuDTO[__${stt.index}__].price"
+                                                    th:value="${#numbers.formatDecimal(productDTO.SkuDTO[__${stt.index}__].price, 0, 0, 'POINT')}">
+                                                <input class="form-control temp_price" th:name="${sku.id}"
+                                                    th:value="${#numbers.formatDecimal(productDTO.SkuDTO[__${stt.index}__].price, 0,'POINT', 0, 'POINT')}"
+                                                    type="text" required>
+                                                <span class="validate-message"></span>
+                                            </td>
+                                            <td><input class="form-control quantity"
+                                                    th:name="SkuDTO[__${stt.index}__].quantity"
+                                                    th:value="${productDTO.SkuDTO[__${stt.index}__].quantity}"
+                                                    type="number" step="1" min="0" required>
+                                                <span class="validate-message"></span>
+                                            </td>
+                                        </tr>
+                                    </th:block>
+                                </tbody>
+                            </table>
+                            <!-- <div style="width: 100%;text-align: right;margin: 15px 0;">
+                                <button class="btn btn--e-brand-b-2">Cập nhật kho hàng</button>
+                            </div> -->
+                        </div>
+                    </div>
+                    <div class="wrapper border-box" style="text-align: right;position: sticky;bottom: 0;margin-bottom: 15px;">
+                        <button  class="btn btn--e-brand-b-2">Cập nhật</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="js/ckeditor.js"></script>
+    <script src="js/jsscript.js"></script>
+    <script>
+        //show notify
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('success')){
+            $('#notify').text(urlParams.getAll('success')).addClass('alert-success');
+            setTimeout(function() { $("#notify").hide(); }, 5000)
+        }else if(urlParams.has('error')){
+            $('#notify').text(urlParams.getAll('error')).addClass('alert-danger');
+            setTimeout(function() { $("#notify").hide(); }, 5000)
+        }
+        //form validate
+        $.validator.messages.required = 'Không được để trống';
+        $.validator.messages.number = "Chỉ được nhập số";
+        $.validator.messages.min = "Giá trị tối thiểu là {0}"
+        $.validator.messages.step = 'Vui lòng nhập bội số của {0}';
+        //merge row with same text
+        var column = $('thead tr th').length;
+        var row = $('tbody tr');
+        var length = row.length;
+        if (column == 3)
+            mergeTableRow(row.eq(0), 0, length, 1, 0);
+        else {
+            mergeTableRow(row.eq(0), 0, length, 1, 0);
+            mergeTableRow(row.eq(0), 0, length, 1, 1);
+        }
+    </script>
+    <script>
+        ClassicEditor.create(document.querySelector('#editor'), {
+            image: {
+                resizeUnit: 'px',
+                resizeOptions: [
+                    {
+                        name: 'resizeImage:75',
+                        value: '600',
+                        icon: 'large'
+                    },
+                    {
+                        name: 'resizeImage:original',
+                        value: null,
+                        icon: 'original'
+                    },
+                    {
+                        name: 'resizeImage:50',
+                        value: '350',
+                        icon: 'medium'
+                    }
+                ],
+                toolbar: [
+                    'resizeImage:50',
+                    'resizeImage:75',
+                    'resizeImage:original',
+                    'imageTextAlternative',
+                    'toggleImageCaption',
+                    'imageStyle:inline',
+                    'imageStyle:block',
+                    'imageStyle:side'
+                ]
+            }
+        })
+            .then()
+            .catch(error => {
+                console.log(error.stack);
+            });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>Danh sách sản phẩm</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/utility.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .disabled > a{
+            color: currentColor;
+            cursor: not-allowed;
+            opacity: 0.5;
+            text-decoration: none;
+            pointer-events: none;
+            }
+        .input-text--primary-style{
+            background-color: #e3e3e3;
+        }
+        .shop-w__form-p-wrap > div {
+            width: 48%;
+        }
+        .slider{
+            height: 5px;
+            position: relative;
+            background: #ddd;
+            border-radius: 5px;
+        }
+        .slider .progress{
+            height: 100%;
+            left: 0%;
+            right: 0%;
+            position: absolute;
+            border-radius: 5px;
+            background: #17A2B8;
+        }
+        .range-input{
+            position: relative;
+        }
+        .range-input input{
+            position: absolute;
+            width: 100%;
+            height: 5px;
+            top: -5px;
+            background: none;
+            pointer-events: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb{
+            height: 17px;
+            width: 17px;
+            border-radius: 50%;
+            background: #17A2B8;
+            pointer-events: auto;
+            -webkit-appearance: none;
+            box-shadow: 0 0 6px rgba(0,0,0,0.05);
+        }
+        input[type="range"]::-moz-range-thumb{
+            height: 17px;
+            width: 17px;
+            border: none;
+            border-radius: 50%;
+            background: #17A2B8;
+            pointer-events: auto;
+            -moz-appearance: none;
+            box-shadow: 0 0 6px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <!--====== Header ======-->
+    <header th:replace="/header/header-guest :: header"> </header>
+    <!--====== App Content ======-->
+    <div class="app-content">
+        <div class="u-s-p-y-90">
+            <div class="container">
+                <form id="form-product-filter" action="/product" method="get">
+                    <input type="hidden" name="keyword" th:value="${search_keyword}" th:unless="${#strings.isEmpty(search_keyword)}">
+                    <div class="row">
+                        <!--====== Filter Section ======-->
+                        <div class="col-lg-3 col-md-12">
+                            <div class="shop-w-master">
+                                <h1 class="shop-w-master__heading u-s-m-b-30"><i class="fas fa-filter u-s-m-r-8"></i>
+                                    <span>LỌC SẢN PHẨM</span>
+                                </h1>
+                            </div>
+                            <div class="shop-w-master__sidebar sidebar--bg-snow">
+                                <div class="u-s-m-b-30">
+                                    <div class="shop-w">
+                                        <div class="shop-w__intro-wrap">
+                                            <h1 class="shop-w__h">Phân loại</h1>
+                                            <span class="fas fa-minus shop-w__toggle" data-target="#s-type" data-toggle="collapse"></span>
+                                        </div>
+                                        <div class="shop-w__wrap collapse show" id="s-type">
+                                            <ul class="shop-w__list gl-scroll">
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="type" value="SmartPhone" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">SmartPhone</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="type" value="Laptop" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Laptop</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="type" value="Máy tính bảng" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Máy tính bảng</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="type" value="Phụ kiện" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Phụ kiện</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="type" value="Máy cũ" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Máy cũ</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="u-s-m-b-30">
+                                    <div class="shop-w">
+                                        <div class="shop-w__intro-wrap">
+                                            <h1 class="shop-w__h">Hãng sản xuất</h1>
+                                            <span class="fas fa-minus shop-w__toggle" data-target="#s-shipping" data-toggle="collapse"></span>
+                                        </div>
+                                        <div class="shop-w__wrap collapse show" id="s-shipping">
+                                            <ul class="shop-w__list gl-scroll">
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Apple" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label" >Apple</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="SamSung" onclick="submitFormFilter()" >
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label" >SamSung</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Oppo" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Oppo</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Huawei" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Huawei</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Xiaomi" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Xiaomi</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Asus" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Asus</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="LG" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">LG</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="MSI" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">MSI</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Acer" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Acer</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="brand" value="Lenovo" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Lenovo</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+                                <div class="u-s-m-b-30">
+                                    <div class="shop-w">
+                                        <div class="shop-w__intro-wrap">
+                                            <h1 class="shop-w__h">Mức giá</h1>
+                                            <span class="fas fa-minus shop-w__toggle" data-target="#s-price" data-toggle="collapse"></span>
+                                        </div>
+                                        <div class="shop-w__wrap collapse show" id="s-price">
+                                            <ul class="shop-w__list gl-scroll">
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="price_range" value="0-1000000" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Dưới 1 triệu</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="price_range" value="1000000-1500000" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label" >Từ 1 - 1,5 triệu</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input   type="checkbox" name="price_range" value="1500000-2000000" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Từ 1,5 - 2 triệu</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="price_range" value="2000000-2500000" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Từ 2 - 2,5 triệu</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                                <li>
+                                                    <!--====== Check Box ======-->
+                                                    <div class="check-box">
+                                                        <input type="checkbox" name="price_range" value="2500000-999999999" onclick="submitFormFilter()">
+                                                        <div class="check-box__state check-box__state--primary">
+                                                            <label class="check-box__label">Trên 2,5 triệu</label>
+                                                        </div>
+                                                    </div>
+                                                    <!--====== End - Check Box ======-->
+                                                </li>
+                                            </ul>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-9 col-md-12">
+                            <div class="shop-p">
+                                <div class="shop-p__toolbar u-s-m-b-30">
+                                    <div class="shop-p__meta-wrap u-s-m-b-60" style="margin-bottom: 1.75rem;">
+                                        <span class="shop-p__meta-text-1" style="font-size: 16px;" th:if="${ #lists.isEmpty(listProduct)}">Rất tiếc chúng tôi không tìm thấy kết quả phù hợp</span>
+                                        <span class="shop-p__meta-text-1" style="font-size: 16px;" th:unless="${ #lists.isEmpty(listProduct)}">Tìm kiếm: 
+                                            <span th:text="${search_keyword}">ff</span>
+                                            <span style="font-size: 14px;color: #4e4e54;margin-left: 20px;" th:text="${'( '+listProduct.totalElements + ' Sản phẩm )'}">(130 sản phẩm)</span>
+                                        </span>
+                                    </div>
+                                    <div style="display: flex;justify-content: right;">
+                                        <div class="u-s-m-b-8">
+                                            <select id="select-page-size" class="select-box select-box--transparent-b-2" name="size" onchange="submitFormFilter()">
+                                                <option value="6">Hiển thị: 6</option>
+                                                <option value="9" >Hiển thị: 9</option>
+                                                <option value="12" selected>Hiển thị: 12</option>
+                                                <option value="15">Hiển thị: 15</option>
+                                            </select>
+                                        </div>
+                                        <div class="u-s-m-b-8">
+                                            <select id="select-sort-by" class="select-box select-box--transparent-b-2" name="order_by" onchange="submitFormFilter()"
+                                                    style="margin-left: 15px;">
+                                                <option selected >Sắp xếp</option>
+                                                <option value="gia-thap-den-cao">Giá thấp đến cao</option>
+                                                <option value="gia-cao-den-thap">Giá cao đến thấp</option>
+                                                <option value="san-pham-moi">Sản phẩm mới</option>
+                                                <option value="san-pham-cu">Sản phẩm cũ</option>
+                                                <option value="san-pham-ban-chay">Sản phẩm bán chạy</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="shop-p__collection">
+                                    <div class="row is-grid-active">
+                                        <div class="col-lg-4 col-md-4 col-sm-6" th:each="products : ${listProduct}">
+                                            <div class="product-m">
+                                                <div class="product-m__thumb">
+        
+                                                    <a class="aspect aspect--bg-grey aspect--square u-d-block" th:href="@{/product/{id}(id=${products.id})}">
+        
+                                                        <img class="aspect__img" th:src="${products.thumbnail}" alt=""></a>
+                                                </div>
+                                                <div class="product-m__content">
+                                                    <div class="product-m__category">
+        
+                                                        <a href="/" th:text="${products.type}" th:href="@{'/product?type=' + ${products.type}}">SmartPhone</a></div>
+                                                    <div class="product-m__name">
+        
+                                                        <a href="/" th:text="${products.name}" th:href="@{/product/{id}(id=${products.id})}">Iphone 14</a></div>
+                                                    <div class="product-m__rating gl-rating-style"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i><i class="far fa-star"></i><i class="far fa-star"></i>
+        
+                                                        <span class="product-m__review">(23)</span></div>
+                                                    <div class="product-m__price" th:text="${products.price}" style="color: #ff4500;"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <ul class="shop-p__pagination" th:if="${listProduct.totalPages gt 0}">
+                                    <li th:classappend="${listProduct.number eq 0} ? 'disabled'">
+                                        <a class="fas fa-angle-left pagination-link" th:href="@{/product?page={id}(id=${listProduct.number lt 2 ? 1 : listProduct.number})}"
+                                        aria-label="Trang trước" title="Trang trước"></a>
+                                    </li>
+                                    <li th:classappend="${i eq listProduct.number + 1} ? 'is-active'"
+                                        th:each="i : ${#numbers.sequence( 1, listProduct.totalPages, 1)}">
+                                        <a  th:href="@{/product?page={id}(id=${i})}" th:text="${i}" class="pagination-link"
+                                            th:title="${'Trang '+ i}">1</a>
+                                    </li>
+                                    
+                                    <li th:classappend="${listProduct.number + 1 eq listProduct.totalPages} ? 'disabled'">
+                                        <a class="fas fa-angle-right pagination-link" th:href="@{/product?page={id}(id=${listProduct.number + 2})}" 
+                                            aria-label="Trang sau" title="Trang sau" ></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <footer th:replace="/footer/footer :: footer"></footer>
+    <script src="js/jsscript.js"></script>
+    <script>
+    $(document).ready(function(){
+        // active checkbox, select base on url param after submit form
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        if(urlParams.has('type')){
+            const paramValues= urlParams.getAll('type');
+            for(let i=0;i<paramValues.length;i++){
+                $('input:checkbox[name="type"][value="' + paramValues[i] + '"]').attr('checked', 'checked');
+            }
+        }
+        if(urlParams.has('brand')){
+            const paramValues= urlParams.getAll('brand');
+            for(let i=0;i<paramValues.length;i++){
+                $('input:checkbox[name="brand"][value="' + paramValues[i] + '"]').attr('checked', 'checked');
+            }
+        }
+        if(urlParams.has('price_range')){
+            const paramValues= urlParams.get('price_range');
+            $('input:checkbox[name="price_range"][value="' + paramValues + '"]').attr('checked', 'checked');
+            
+        }
+        if(urlParams.has('order_by')){
+            const paramValues= urlParams.get('order_by');
+            $("#select-sort-by").val(paramValues);
+        }
+        if(urlParams.has('size')){
+            const paramValues= urlParams.get('size');
+            $("#select-page-size").val(paramValues);
+        }
+        // change href attribute of pagination to keep filter parameter
+        var newURL =  window.location.search;
+        const newURLParams = new URLSearchParams(newURL);
+        if(newURLParams.has('page')){
+            newURLParams.delete('page');
+        }
+        $("a.pagination-link").each(function() {
+            var $this = $(this);       
+            var _href = $this.attr("href");
+            $this.attr("href", _href +'&'+newURLParams);
+        });
+        //unchecked other price checkboxes
+        $('input:checkbox[name="price_range"]').on('change', function() {
+            $('input:checkbox[name="price_range"]').not(this).prop('checked', false);  
+        });
+    });
+    //submit form when click checkboxes
+    function submitFormFilter(){
+        setTimeout( function () { 
+            document.getElementById("form-product-filter").submit();
+        }, 500);
+        
+    }
+    //price range slider
+    const rangeInput = document.querySelectorAll(".range-input input"),
+    priceInput = document.querySelectorAll(".price-range-input"),
+    range = document.querySelector(".slider .progress");
+    let priceGap = 500000;
+
+    priceInput.forEach(input =>{
+        input.addEventListener("input", e =>{
+            let minPrice = parseInt(priceInput[0].value),
+            maxPrice = parseInt(priceInput[1].value);
+            if((maxPrice - minPrice >= priceGap) && maxPrice <= rangeInput[1].max){
+                if(e.target.className === "input-min"){
+                    rangeInput[0].value = minPrice;
+                    range.style.left = ((minPrice / rangeInput[0].max) * 100) + "%";
+                }else{
+                    rangeInput[1].value = maxPrice;
+                    range.style.right = 100 - (maxPrice / rangeInput[1].max) * 100 + "%";
+                }
+            }
+        });
+    });
+
+    rangeInput.forEach(input =>{
+        input.addEventListener("input", e =>{
+            let minVal = parseInt(rangeInput[0].value),
+            maxVal = parseInt(rangeInput[1].value);
+
+            if((maxVal - minVal) < priceGap){
+                if(e.target.className === "range-min"){
+                    rangeInput[0].value = maxVal - priceGap
+                }else{
+                    rangeInput[1].value = minVal + priceGap;
+                }
+            }else{
+                priceInput[0].value = numberWithCommas(minVal);
+                priceInput[1].value = numberWithCommas(maxVal);
+                createPriceRange(minVal, maxVal);
+                range.style.left = ((minVal / rangeInput[0].max) * 100) + "%";
+                range.style.right = 100 - (maxVal / rangeInput[1].max) * 100 + "%";
+            }
+        });
+    });
+    
+    </script>
+    <script src="js/vendor.js"></script>
+    <script src="js/jquery.shopnav.js"></script>
+    <script src="js/app.js"></script>
+</body>
+
+</html>

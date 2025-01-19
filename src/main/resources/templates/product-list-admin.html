@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <base href="/">
+        <meta charset="utf-8">
+        <title>Quản lý sản phẩm</title>
+        <script src="js/jquery-3.6.0.min.js"></script>
+        <link href="images/favicon.png" rel="shortcut icon">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/app.css">
+        <script src="https://kit.fontawesome.com/7bf2db2eec.js" crossorigin="anonymous"></script>
+        <style>
+            body{
+                background-color: #f6f6f6;
+                font-size: 14px;
+            }
+            td, th{
+                text-align: center;
+            }
+            tbody:hover td[rowspan],
+            tr:hover td {
+                background: rgba(0,0,0,.075);
+            }
+            a,a:hover {
+                color: black;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="display: flex;">
+            <!-- Navbar -->
+            <div  th:replace="/header/navbar-admin :: navbar-admin"></div>
+            <div id="page-content-wrapper">
+                <div class="container">
+                    <div class="wrapper border-box">
+                        <ul class="breadcrumb__list">
+                            <li class="has-separator">
+                                <a href="/admin">Trang chủ</a>
+                            </li>
+                            <li class="is-marked">
+                                <a href="/product/admin">Quản lý sản phẩm</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container">
+                    <form id="form-product-filter" method="get" th:action="@{/product/admin}"></form>
+                    <div class="wrapper border-box ">
+                        <div style="display: flex;justify-content: space-between;margin: 0 0 15px 0;">
+                            <div style="display: flex;">
+                                <div style="display: flex;position: relative;">
+                                    <input class="form-control" th:value="${search_keyword}" name="keyword" form="form-product-filter" placeholder="Nhập tên sản phẩm"
+                                        style="padding-right: 30px;">
+                                    <button class="btn btn--icon fas fa-search" form="form-product-filter" type="submit" style="font-size: 18px;position: absolute;height: 100%;right: 8px;top: -2px; "></button>
+                                </div>
+                                <div class="u-s-m-b-8">
+                                    <select id="select-type" class="select-box select-box--transparent-b-2" name="type" form="form-product-filter" >
+                                        <option value="">Loại: Tất cả</option>
+                                        <option value="SmartPhone">SmartPhone</option>
+                                        <option value="Laptop">Laptop</option>
+                                        <option value="Tablet">Máy tính bảng</option>
+                                    </select>
+                                </div>
+                                <div class="u-s-m-b-8">
+                                    <select id="select-brand" class="select-box select-box--transparent-b-2" name="brand" form="form-product-filter" >
+                                        <option value="">NSX: Tất cả</option>
+                                        <option value="SamSung">SamSung</option>
+                                        <option value="Apple">Apple</option>
+                                        <option value="Oppo">Oppo</option>
+                                        <option value="Huawei">Huawei</option>
+                                        <option value="Xiaomi">Xiaomi</option>
+                                        <option value="Asus">Asus</option>
+                                        <option value="LG">LG</option>
+                                        <option value="MSI">MSI</option>
+                                        <option value="Acer">Acer</option>
+                                        <option value="Lenovo">Lenovo</option>
+                                    </select>
+                                </div>
+                                <div class="u-s-m-b-8">
+                                    <select id="select-page-size" form="form-product-filter" class="select-box select-box--transparent-b-2" name="size" >
+                                        <option value="6">Hiển thị: 6</option>
+                                        <option value="9">Hiển thị: 9</option>
+                                        <option value="12" selected >Hiển thị: 12</option>
+                                        <option value="15">Hiển thị: 15</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <a href="/product/create"><button class="btn btn--e-brand-b-2">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Tạo sản phẩm</span></button></a>
+                        </div>
+                        <table class="table table-bordered ">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th style="width: 350px;">Tên sản phẩm</th>
+                                    <th>Phân loại hàng</th>
+                                    <th>Giá bán</th>
+                                    <th>Kho hàng</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                                <tbod>
+                                    <tr  th:each="products : ${listProduct}">
+                                        <td >
+                                            <a th:href="@{/product/admin/{id}(id=${products.id})}" style="display: flex;justify-content: left;">
+                                                <img th:src="${products.thumbnail}" width="70px" height="70px">
+                                                <div style="margin-left: 10px;">
+                                                    <div th:text="${products.name}" class="product__name"></div>
+                                                    <div th:text="'ID: '+${products.id}" style="text-align: left;"></div>
+                                                </div>
+                                            </a>
+                                        </td>
+                                        <td style="text-align: left;">
+                                            <div th:each="variant : ${products.variantDTO}">
+                                                <span th:text="${variant.name + ': '}"></span>
+                                                <span th:each="value, stt : ${variant.valueDTO}" th:text="!${stt.last} ? ${value.name+'/'} :${value.name}">
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td th:text="${products.price}" style="text-align: right;"></td>
+                                        <td th:text="${#aggregates.sum(products.skuDTO.![quantity])}"></td>
+                                        <td>
+                                            <a th:href="@{/product/admin/{id}(id=${products.id})}"><button class="btn btn--e-brand-b-2 btn-detail">
+                                                <i class="fa-solid fa-circle-info"></i>
+                                                <span>Chi tiết</span></button></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                          </table>
+                          <ul class="shop-p__pagination" th:if="${listProduct.totalPages gt 0}">
+                            <li th:classappend="${listProduct.number eq 0} ? 'disabled'">
+                                <a class="fas fa-angle-left pagination-link" th:href="@{/product/admin?page={id}(id=${listProduct.number lt 2 ? 1 : listProduct.number})}"
+                                aria-label="Trang trước" title="Trang trước"></a>
+                            </li>
+                            <li th:classappend="${i eq listProduct.number + 1} ? 'is-active'"
+                                th:each="i : ${#numbers.sequence( 1, listProduct.totalPages, 1)}">
+                                <a  th:href="@{/product/admin?page={id}(id=${i})}" th:text="${i}" class="pagination-link"
+                                    th:title="${'Trang '+ i}">1</a>
+                            </li>
+                            
+                            <li th:classappend="${listProduct.number + 1 eq listProduct.totalPages} ? 'disabled'">
+                                <a class="fas fa-angle-right pagination-link" th:href="@{/product/admin?page={id}(id=${listProduct.number + 2})}" 
+                                    aria-label="Trang sau" title="Trang sau" ></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            // active select option base on url param after submit form
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if(urlParams.has('type')){
+                const paramValues= urlParams.getAll('type');
+                for(let i=0;i<paramValues.length;i++){
+                    $('select[name="type"] option[value="' + paramValues[i] + '"]').attr('selected', 'selected');
+                }
+            }
+            if(urlParams.has('brand')){
+                const paramValues= urlParams.getAll('brand');
+                for(let i=0;i<paramValues.length;i++){
+                    $('select[name="brand"] option[value="' + paramValues[i] + '"]').attr('selected', 'selected');
+                }
+            }
+            if(urlParams.has('size')){
+                const paramValues= urlParams.get('size');
+                $("#select-page-size").val(paramValues);
+            }
+            if(urlParams.has('order_by')){
+                const paramValues= urlParams.get('order_by');
+                $("#select-sort-by").val(paramValues);
+            }
+            // change href attribute of pagination to keep filter parameter
+            if(urlParams.has('page')){
+                urlParams.delete('page');
+            }
+            $("a.pagination-link").each(function() {
+                var $this = $(this);       
+                var _href = $this.attr("href");
+                $this.attr("href", _href +'&'+urlParams);
+            });
+            $('#select-page-size, #select-brand, #select-type').on('change', function(){
+                $('#form-product-filter').submit();
+            })
+        </script>
+    </body>
+    </html>

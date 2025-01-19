@@ -1,0 +1,117 @@
+<header th:fragment="header-guest" class="header--style-2 header--box-shadow">
+    <!--====== Nav 1 ======-->
+    <nav class="primary-nav">
+        <div class="container">
+            <!--====== Primary Nav ======-->
+            <div class="primary-nav">
+                <!--====== Main Logo ======-->
+                <a class="main-logo" href="/">
+                    <img src="images/logo/shopprism-logo-2.png" alt="" width="200px"></a>
+                <!--====== End - Main Logo ======-->
+                <!--====== Search Form ======-->
+                <form class="main-form" method="get" th:action="@{/product}" style="height: 84px;">
+                    <label for="main-search"></label>
+                    <input name="keyword" class="input-text input-text--border-radius input-text--style-2" type="text"
+                        id="main-search" placeholder="Nhập tên sản phẩm">
+                    <button class="btn btn--icon fas fa-search main-search-button" type="submit"></button>
+                </form>
+                <!--====== End - Search Form ======-->
+                <!--====== Dropdown Main plugin ======-->
+                <div class="menu-init" id="navigation">
+                    <button class="btn btn--icon toggle-button fas fa-cogs" type="button"></button>
+                    <!--====== Menu ======-->
+                    <div class="ah-lg-mode">
+                        <!--====== List ======-->
+                        <ul class="ah-list ah-list--design1 ah-list--link-color-white">
+                            <li class="has-dropdown" data-tooltip="tooltip" data-placement="left" title="Tài khoản">
+                                <a href="#">
+                                    <i class="far fa-user-circle"></i>
+                                    <span sec:authorize="isAuthenticated()" sec:authentication="principal.username">tes1@gmail.com</span>
+                                </a>
+                                <!--====== Dropdown ======-->
+                                <span class="js-menu-toggle"></span>
+                                <ul>
+                                    <li sec:authorize="isAuthenticated()">
+                                        <a href="/account"><i class="fas fa-user-circle u-s-m-r-6"></i>
+                                            <span>Tài khoản</span></a>
+                                    </li>
+                                    <li sec:authorize="isAuthenticated()">
+                                        <a href="/order/all"><i class="fas fa-cart-arrow-down u-s-m-r-6"></i>
+                                            <span>Đơn hàng</span></a>
+                                    </li>
+                                    <li sec:authorize="!isAuthenticated()">
+                                        <a href="/sign-up"><i class="fas fa-user-plus u-s-m-r-6"></i>
+                                            <span>Đăng ký</span></a>
+                                    </li>
+                                    <li sec:authorize="!isAuthenticated()">
+                                        <a href="/login"><i class="fas fa-lock u-s-m-r-6"></i>
+                                            <span>Đăng nhập</span></a>
+                                    </li>
+                                    <li sec:authorize="isAuthenticated()">
+                                        <a href="/logout"><i class="fas fa-lock-open u-s-m-r-6"></i>
+                                            <span>Đăng xuất</span></a>
+                                    </li>
+                                </ul>
+                                <!--====== End - Dropdown ======-->
+                            </li>
+                            <li data-tooltip="tooltip" data-placement="left" title="Giỏ hàng">
+                                <a href="/cart" class="mini-cart-shop-link">
+                                    <i class="fas fa-shopping-bag"></i>
+                                </a>
+                            </li>
+                        </ul>
+                        <!--====== End - List ======-->
+                    </div>
+                    <!--====== End - Menu ======-->
+                </div>
+                <!--====== End - Dropdown Main plugin ======-->
+            </div>
+            <!--====== End - Primary Nav ======-->
+        </div>
+    </nav>
+    <!--====== End - Nav 1 ======-->
+
+    <!--====== Nav 2 ======-->
+    <nav class="secondary-nav-wrapper">
+        <div class="container">
+            <!--====== Secondary Nav ======-->
+            <div class="secondary-nav" style="justify-content: center;">
+                <!--====== Dropdown Main plugin ======-->
+                <div class="menu-init" id="navigation2">
+                    <!--====== Menu ======-->
+                    <div class="ah-lg-mode">
+                        <!--====== List ======-->
+                        <ul class="ah-list ah-list--design2 ah-list--link-color-white">
+                            <li>
+                                <a href="/product?type=SmartPhone">SMARTPHONE</a>
+                            </li>
+                            <li>
+                                <a href="/product?type=Laptop">LAPTOP</a>
+                            </li>
+                            <li>
+                                <a href="/product?type=Máy tính bảng">MÁY TÍNH BẢNG</a>
+                            </li>
+                            <li>
+                                <a href="/product?type=Phụ kiện">PHỤ KIỆN</a>
+                            </li>
+                            <li>
+                                <a href="/product?type=Máy cũ">MÁY CŨ</a>
+                            </li>
+                            <li>
+                                <a href="/">SIM THẺ</a>
+                            </li>
+                            <li>
+                                <a href="/">KHUYẾN MẠI</a>
+                            </li>
+                        </ul>
+                        <!--====== End - List ======-->
+                    </div>
+                    <!--====== End - Menu ======-->
+                </div>
+                <!--====== End - Dropdown Main plugin ======-->
+            </div>
+            <!--====== End - Secondary Nav ======-->
+        </div>
+    </nav>
+    <!--====== End - Nav 2 ======-->
+</header>

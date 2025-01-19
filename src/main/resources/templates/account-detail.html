@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <base href="/">
+        <meta charset="utf-8">
+        <title>Thông tin tài khoản</title>
+        <script src="js/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/jquery.validation/1.15.0/additional-methods.min.js"></script>
+        <link href="images/favicon.png" rel="shortcut icon">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/vendor.css">
+        <link rel="stylesheet" href="css/utility.css">
+        <link rel="stylesheet" href="css/app.css">
+        <style>
+            .dash__h2.u-s-m-b-8{
+                font-weight: 700;
+            }
+            button:focus{
+                outline: none;
+            }
+            input, select{
+                width: 100%;
+            }
+            .dash__custom-link{
+                margin-left: 10px;
+            }
+            .witdh-half {
+                width: 47%;
+            }
+            .input-inline {
+                display: flex;
+                justify-content: space-between;
+            }
+            .validate-message{
+                font-size: 13px;
+                color: red;
+            }
+            .acc-infor{
+                line-height: calc(1.5em + .75rem + 2px);
+                color: black;
+            }
+            .label{
+                color: #6c6c6c;
+            }
+        </style>
+    </head>
+    <body style="position: relative;">
+        <div class="container" style="position: absolute;top: 20px;right: 15px;left: 15px;z-index: 9999;">
+            <div id="message" class="alert" style="width: 100%;"></div>
+        </div>
+        <!--====== Header ======-->
+        <header th:replace="/header/header-guest :: header"> </header>
+        <div class="app-content">
+            <div class="section__content">
+                <div class="container">
+                    <div class="breadcrumb__wrap" style="margin-top: 15px;margin-bottom: 30px;">
+                        <ul class="breadcrumb__list">
+                            <li class="has-separator">
+                                <a href="/">Trang chủ</a>
+                            </li>
+                            <li class="is-marked">
+                                <a href="/account">Tài khoản của tôi</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="u-s-p-b-60">
+                <div class="section__content">
+                    <div class="das">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-3 col-md-12">
+                                    <div class="dash__box dash__box--bg-white dash__box--shadow u-s-m-b-30">
+                                        <div class="dash__pad-1">
+                                            <span class="dash__text u-s-m-b-16"
+                                                th:text="${#authentication.getPrincipal().getUsername()}"></span>
+                                            <ul class="dash__f-list">
+                                                <li>
+                                                    <a href="/account">Tài khoản</a>
+                                                </li>
+                                                <li>
+                                                    <a href="/order/all">Đơn hàng</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-9 col-md-12">
+                                    <div class="dash__box dash__box--shadow dash__box--radius dash__box--bg-white u-s-m-b-30">
+                                        <div class="dash__pad-2">
+                                            <h1 class="dash__h1 u-s-m-b-14"  style="font-weight: 600;margin-bottom: 2rem;">Thông tin tài khoản</h1>
+                                            <div class="form-line">
+                                                <span class="label">Họ và tên:</span>
+                                                <span class="acc-infor" th:text="${accountDTO.name}"></span>
+                                            </div>
+                                            <div class="form-line">
+                                                <span class="label">Email:</span>
+                                                <span class="acc-infor" th:text="${accountDTO.email}"></span>
+                                            </div>
+                                            <div class="form-line">
+                                                <span class="label">Số điện thoại:</span>
+                                                <span class="acc-infor" th:text="${accountDTO.phone}"></span>
+                                            </div>
+                                            <div class="form-line">
+                                                <span class="label">Ngày sinh:</span>
+                                                <span class="acc-infor" th:text="${#dates.format(accountDTO.birthday, 'dd/MM/yyyy')}"></span>
+                                            </div>
+                                            <div class="form-line">
+                                                <span class="label">Địa chỉ:</span>
+                                                <span class="acc-infor" th:text="${accountDTO.address+', '+accountDTO.ward_name+', '+accountDTO.district_name+', '+accountDTO.city_name}"></span>
+                                            </div>
+                                            <div class="row" style="justify-content: right;">
+                                                    <button type="button" class="dash__custom-link btn--e-transparent-brand-b-2"
+                                                        data-modal="modal" data-modal-id="#modal-changeAccountDetail" >Cập nhật thông tin</button>
+                                                    <button type="button" class="dash__custom-link btn--e-brand-b-2"
+                                                        data-modal="modal" data-modal-id="#modal-changepassword">Đổi mật khẩu</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Change Password Modal -->
+        <div class="modal fade" id="modal-changepassword" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content modal--shadow">
+                    <div class="modal-body">
+                        <form class="d-modal__form" method="post" th:action="@{/account/update/password}" onsubmit="return matchPassword()">
+                            <div class="u-s-m-b-15">
+                                <h1 class="gl-modal-h1" style="margin-bottom: 20px;">Thay đổi mật khẩu</h1>
+                                <div class="u-s-m-b-30">
+                                    <label class="gl-label" for="reg-lname">MẬT KHẨU *</label>
+                                    <input class="input-text input-text--primary-style" type="password" id="password" placeholder="Mật khẩu" required="required" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&amp;])[A-Za-z\d@$!%*?&amp;]{8,10}$" oninvalid="this.setCustomValidity('Mật khẩu tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường, chữ số và ký tự đặc biệt')" oninput="this.setCustomValidity('')" name="password" value="">
+                                </div>
+                                <div class="u-s-m-b-30">
+                                    <div class="input-inline">
+                                        <span class="gl-label" for="reg-lname">NHẬP LẠI MẬT KHẨU *</span>
+                                    </div>
+                                    <input class="input-text input-text--primary-style" type="password" id="confirm_password" placeholder="Nhập lại mật khẩu" required="required">
+                                </div>
+                            </div>
+                            <div id="confirmPassLabel" 
+                                style="font-size: 13px;color: red;visibility:hidden;width: 100%;text-align: right;margin-bottom: 7px;">Mật khẩu nhập lại không khớp</div>
+                            <div class="gl-modal-btn-group" style="justify-content: right;">
+                                <button class="btn btn--e-brand-b-2" type="submit">XÁC NHẬN</button>
+                                <button class="btn btn--e-grey-b-2" type="button" data-dismiss="modal">HỦY</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Change Account Detail Modal -->
+        <div class="modal fade" id="modal-changeAccountDetail" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" style="max-width: 700px;">
+                <div class="modal-content modal--shadow">
+                    <div class="modal-body">
+                        <form id="update-account-detail-form" class="d-modal__form" th:object="${accountDTO}" method="post" th:action="@{/account/update/profile}">
+                            <div class="u-s-m-b-15">
+                                <h1 class="gl-modal-h1" style="margin-bottom: 20px;">Cập nhật thông tin</h1>
+                                <div class="u-s-m-b-30 input-inline">
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="reg-fname">HỌ VÀ TÊN *</label>
+                                        <input th:field="*{name}" class="input-text input-text--primary-style" type="text" placeholder="Họ và tên" 
+                                            required="required" pattern="^(?!.*\s{2,})[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+" 
+                                            id="name">
+                                        <div class="validate-message"></div>
+                                    </div>
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="reg-lname">NGÀY SINH *</label>
+                                        <input th:field="*{birthday}" class="input-text input-text--primary-style" type="date" required="required" id="birthday">	
+                                        <div class="validate-message"></div>
+                                    </div>
+                                 </div>
+                                 <div class="u-s-m-b-30 input-inline">
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="reg-lname">SỐ ĐIỆN THOẠI *</label>
+                                        <input id="phone" th:field="*{phone}" class="input-text input-text--primary-style" type="text" placeholder="Số điện thoại" 
+                                            required="required" pattern="[0-9]{10}">	
+                                        <div class="validate-message"></div>
+                                    </div>
+                                </div>
+                                <div class="u-s-m-b-30 input-inline">
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="billing-fname">ĐỊA CHỈ *</label>
+                                        <input id="address" th:field="*{address}" class="input-text input-text--primary-style" type="text" required="">
+                                        <div class="validate-message"></div>
+                                    </div>
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="billing-lname">TỈNH/THÀNH PHỐ *</label>
+                                        <select id="select-box-city" th:field="${accountDTO.city_id}" class="select-box select-box--primary-style" required="">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="u-s-m-b-30 input-inline">
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="billing-fname">QUẬN/HUYỆN *</label>
+                                        <select id="select-box-district" th:field="${accountDTO.district_id}" class="select-box select-box--primary-style" required="" >
+                                        </select>
+                                    </div>
+                                    <div class="witdh-half">
+                                        <label class="gl-label" for="billing-lname">PHƯỜNG/XÃ *</label>
+                                        <select id="select-box-ward" th:field="${accountDTO.ward_id}" class="select-box select-box--primary-style" required="" >
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <input th:field="${accountDTO.email}" hidden>
+                            <input id="input-province-name" th:field="${accountDTO.city_name}" hidden> 
+                            <input id="input-district-name" th:field="${accountDTO.district_name}"  hidden> 
+                            <input id="input-ward-name" th:field="${accountDTO.ward_name}"  hidden> 
+                            <div class="gl-modal-btn-group" style="justify-content: right;">
+                                <button class="btn btn--e-brand-b-2" type="submit">XÁC NHẬN</button>
+                                <button class="btn btn--e-grey-b-2" type="button" data-dismiss="modal">HỦY</button></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="js/jsscript.js"></script>
+        <script th:inline="javascript">
+            var city_name = /*[[${accountDTO.city_name}]]*/ 'default';
+            var district_name = /*[[${accountDTO.district_name}]]*/ 'default';
+            var ward_name = /*[[${accountDTO.ward_name}]]*/ 'default';
+            initSelectBoxCity(city_name, district_name, ward_name);
+
+            var newURL = window.location.search;
+            const newURLParams = new URLSearchParams(newURL);
+            if (newURLParams.has('message')){
+                var message = newURLParams.get("message");
+                if(message == 'Đổi mật khẩu thành công' || message == 'Cập nhật thông tin thành công'){
+                    $("#message").addClass("alert-success").text(message);
+                }else if(message == 'Đổi mật khẩu thất bại, đã xảy ra lỗi' || message == 'Cập nhật thông tin thất bại, đã xảy ra lỗi')
+                    $("#message").addClass("alert-danger").text(message);
+                window.setTimeout(function () {
+                    $("#message").parent().fadeTo(500, 0).slideUp(500, function () {
+                        $(this).remove();
+                    });
+                }, 4000);
+            }else{
+                $("#message").parent().remove();
+            }
+        </script>
+        <script src="js/vendor.js"></script>
+        <script src="js/jquery.shopnav.js"></script>
+        <script src="js/app.js"></script>
+    </body>
+</html>

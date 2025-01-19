@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="images/favicon.png" rel="shortcut icon">
+    <title>Đăng ký tài khoản</title>
+    <!--====== Google Font ======-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <!--====== Vendor Css ======-->
+    <link rel="stylesheet" href="css/vendor.css">
+    <!--====== Utility-Spacing ======-->
+    <link rel="stylesheet" href="css/utility.css">
+    <!--====== App ======-->
+    <link rel="stylesheet" href="css/app.css">
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <style>
+		.witdh-half{
+			width: 47%;
+		}
+		.input-inline{
+            display: flex;
+            justify-content: space-between;
+        }
+        .select-box{
+            width: 100%;
+            padding: 0 18px;
+            height: 40px;
+        }
+	</style>
+</head>
+<body class="config">
+    <div class="preloader is-active">
+        <div class="preloader__wrap">
+
+            <img class="preloader__img" src="images/preloader.png" alt=""></div>
+    </div>
+
+    <!--====== Main App ======-->
+    <div id="app">
+
+        <!--====== App Content ======-->
+        <div class="app-content">
+
+            <!--====== Section 1 ======-->
+            <div class="u-s-p-y-60" style="padding-bottom: 30px;padding-top: 20px;">
+
+                <!--====== Section Content ======-->
+                <div class="section__content">
+                    <div class="container">
+                        <div class="breadcrumb">
+                            <div class="breadcrumb__wrap">
+                                <ul class="breadcrumb__list">
+                                    <li class="has-separator">
+
+                                        <a href="/">TRANG CHỦ</a></li>
+                                    <li class="is-marked">
+
+                                        <a href="/sign-up">ĐĂNG KÝ TÀI KHOẢN</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--====== End - Section 1 ======-->
+
+
+            <!--====== Section 2 ======-->
+            <div class="u-s-p-b-60" style="padding-bottom: 0px;">
+
+                <!--====== Section Intro ======-->
+                <div class="section__intro u-s-m-b-60">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="section__text-wrap">
+                                    <h1 class="section__heading u-c-secondary">TẠO TÀI KHOẢN</h1>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--====== End - Section Intro ======-->
+
+
+                <!--====== Section Content ======-->
+                <div class="section__content">
+                    <div class="container">
+                        <div class="row row--center">
+                            <div class="col-lg-6 col-md-8 u-s-m-b-30">
+                                <div class="l-f-o">
+                                    <div class="l-f-o__pad-box">
+                                        <h1 class="gl-h1">THÔNG TIN CÁ NHÂN</h1>
+                                        <form class="l-f-o__form" method="post" th:action="@{/sign-up}" th:object="${accountDTO}" onsubmit="return matchPassword()">
+                                            <div class="u-s-m-b-30 input-inline">
+                                                <div class="witdh-half">
+                                                    <label class="gl-label" for="reg-fname">HỌ VÀ TÊN *</label>
+                                                    <input class="input-text input-text--primary-style" type="text" th:field="*{name}" placeholder="Họ và tên"  required="required"
+                                                    pattern="^(?!.*\s{2,})[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂẾưăạảấầẩẫậắằẳẵặẹẻẽềềểếỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ\s]+"
+                                                    oninvalid="this.setCustomValidity('Họ tên không thể chứa chữ số hoặc ký tự đặc biệt')" 
+                                                	oninput="this.setCustomValidity('')">
+                                                </div>
+                                                <div class="witdh-half">
+                                                    <label class="gl-label" for="reg-lname" th:unless="${emailError != null}" >EMAIL *</label>
+                                                    <label class="gl-label" for="reg-lname" th:if="${emailError != null}" th:text="${emailError}" style="font-size: 13px;color: red;"></label>
+                                                    <input id="email" class="input-text input-text--primary-style" type="email" th:field="*{email}" placeholder="Email" required>
+                                                </div>
+                                             </div>
+                                            <div class="u-s-m-b-30">
+                                                <label class="gl-label" for="reg-lname">MẬT KHẨU *</label>
+                                                <input class="input-text input-text--primary-style" type="password" th:field="*{password}" id="password" placeholder="Mật khẩu" required="required">
+                                            </div>
+                                            <div class="u-s-m-b-30">
+                                            	<div class="input-inline">
+                                                	<label class="gl-label" for="reg-lname">NHẬP LẠI MẬT KHẨU *</label>
+                                                	<label id="confirmPassLabel" style="font-size: 13px;color: red;visibility:hidden;">Mật khẩu nhập lại không khớp</label>
+                                                </div>
+                                                <input class="input-text input-text--primary-style" type="password"  id="confirm_password" placeholder="Nhập lại mật khẩu" required="required">
+                                            </div>
+                                             <div class="u-s-m-b-30 input-inline">
+                                                <div class="witdh-half">
+													<label class="gl-label" for="reg-lname">NGÀY SINH *</label>
+                                                	<input class="input-text input-text--primary-style" th:field="*{birthday}" type="date"  required="required">	
+												</div>
+												<div class="witdh-half">
+													<label class="gl-label" for="reg-lname" th:unless="${phoneError != null}" >SỐ ĐIỆN THOẠI *</label>
+													<label class="gl-label" for="reg-lname" th:if="${phoneError != null}" th:text="${phoneError}" style="font-size: 13px;color: red;"></label>
+                                                	<input id="phone" class="input-text input-text--primary-style" type="text" th:field="*{phone}"  placeholder="Số điện thoại" required="required"
+	                                                	pattern="[0-9]{10}"
+						                                oninvalid="this.setCustomValidity('Số điện thoại có dạng 10 chữ số từ 0-9')"
+						  								oninput="this.setCustomValidity('')">	
+												</div>
+                                            </div>
+                                            <div class="u-s-m-b-30 input-inline">
+                                                <div class="witdh-half">
+                                                    <label class="gl-label" for="reg-email">ĐỊA CHỈ *</label>
+                                                    <input class="input-text input-text--primary-style" type="text" th:field="*{address}"  placeholder="Địa chỉ" required="required">
+                                                </div>
+                                                <div class="witdh-half">
+                                                    <label class="gl-label">TỈNH/THÀNH PHỐ *</label>
+                                                    <select id="select-box-city" th:field="*{city_id}" class="select-box select-box--primary-style"  required></select>
+                                                </div>
+                                            </div>
+                                            <div class="u-s-m-b-30 input-inline">
+                                                <div class="witdh-half">
+                                                    <label class="gl-label">QUẬN/HUYỆN *</label>
+                                                    <select id="select-box-district" th:field="*{district_id}"   class="select-box select-box--primary-style" required>
+                                                    </select>
+                                                </div>
+                                                <div class="witdh-half">
+                                                    <label class="gl-label">PHƯỜNG/XÃ *</label>
+                                                    <select id="select-box-ward" th:field="*{ward_id}" class="select-box select-box--primary-style" required  >
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <input id="input-province-name" th:field="*{city_name}" hidden> 
+                                            <input id="input-district-name" th:field="*{district_name}"  hidden> 
+                                            <input id="input-ward-name" th:field="*{ward_name}"  hidden> 
+                                            <div class="u-s-m-b-15 input-inline">
+                                                <button class="btn btn--e-transparent-brand-b-2" type="submit">Đăng ký</button>
+                                                <span style="font-size:13px;font-weight: 600;" >Đã có tài khoản? <a class="gl-link" href="/login">Đăng nhập</a></span>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--====== End - Section Content ======-->
+            </div>
+            <!--====== End - Section 2 ======-->
+        </div>
+        <!--====== End - App Content ======-->
+    </div>
+    <!--====== End - Main App ======-->
+    
+    <script th:inline="javascript">
+    	$(document).ready(function () {
+	    	var phoneError = /*[[${phoneError}]]*/ null;
+	    	var emailError = /*[[${emailError}]]*/ null;
+            if(emailError != null)
+		        $("#email").focus();
+            else if(phoneError != null)
+		        $("#phone").focus();
+
+            $('#select-box-city').append("<option disabled selected value> -- Chọn tỉnh/thành phố -- </option>")
+            $('#select-box-district').append("<option disabled selected value> -- Chọn quận/huyện -- </option>")
+            $('#select-box-ward').append("<option disabled selected value> -- Chọn phường/xã -- </option>")
+            initSelectBoxCity();
+		});
+    	
+    	function matchPassword(){
+	    	var psw1 = document.getElementById('password').value;
+	    	var psw2 = document.getElementById('confirm_password').value;
+	    	if(psw1 != psw2){
+	    		console.log("ko khop");
+	    		document.getElementById('confirmPassLabel').style.visibility="visible";
+	    		document.getElementById("confirm_password").focus();
+	    		return false;
+	    	}else return true;
+    	}
+    </script>
+
+    
+    <script src="js/vendor.js"></script>
+    <script src="js/jquery.shopnav.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/jsscript.js"></script> 
+</body>
+</html>

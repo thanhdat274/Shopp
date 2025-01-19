@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>Trang chủ | Admin</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/app.css">
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/xy.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <style>
+        #revenua-chart,
+        #order-status-chart,
+        #best-selling-product-chart,
+        #chartdiv {
+            width: 100%;
+            height: 300px;
+        }
+
+        body {
+            background-color: #f6f6f6;
+        }
+
+        .select-box,
+        .select-box>option {
+            font-size: 15px;
+        }
+
+        .label-chart {
+            color: black;
+            font-size: 18px;
+            margin-top: 25px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .label-overview {
+            color: black;
+            font-size: 18px;
+        }
+
+        .text-overview {
+            font-size: 24px;
+            color: #fa4500;
+            font-weight: 500;
+        }
+
+        .overview-line {
+            display: flex;
+            width: 100%;
+            margin: 0 0 15px 0;
+        }
+
+        .overview-line>div {
+            width: 49%;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex;">
+        <!-- Navbar -->
+        <div th:replace="/header/navbar-admin :: navbar-admin"></div>
+        <div id="page-content-wrapper" style="position: relative;">
+            <div class="container" style="display: flex;align-items: flex-start;">
+                <form id="statistic-form" hidden method="get" th:action="@{/admin}"></form>
+                <div class="wrapper border-box">
+                    <div class="label-chart">Sản phẩm bán chạy</div>
+                    <div id="best-selling-product-chart"></div>
+                </div>
+                <div style="width: 15px;"></div>
+                <div class="wrapper border-box" style="padding: 30px;">
+                    <div class="overview-line">
+                        <div>
+                            <div class="label-overview">Đơn đặt hàng mới</div>
+                            <div th:text="${processingOrder}" class="text-overview"></div>
+                        </div>
+                        <div>
+                            <div class="label-overview">Sản phẩm đang bán</div>
+                            <div th:text="${totalProduct}" class="text-overview"></div>
+                        </div>
+                    </div>
+                    <div class="overview-line">
+                        <div>
+                            <div class="label-overview">Doanh thu hôm nay</div>
+                            <div th:text="${#numbers.formatDecimal(todayRevenua, 0,'POINT',0, 'POINT')+ ' ₫'}"
+                                class="text-overview"></div>
+                        </div>
+                        <div>
+                            <div class="label-overview">Tổng tiền hoàn trả</div>
+                            <div class="text-overview"
+                                th:text="${#numbers.formatDecimal(todayRefund, 0,'POINT',0, 'POINT')+ ' ₫'}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="container">
+                <div class="wrapper border-box">
+                    <div style="display: flex;justify-content: right;padding: 10px 21px;">
+                        <select form="statistic-form" id="statistic-select-box" name="findBy"
+                            class="select-box select-box--primary-style">
+                            <option value="dayofweek">Tuần này</option>
+                            <option value="month" selected>Năm nay</option>
+                        </select>
+                    </div>
+                    <div class="label-chart">Thống kê số lượng đặt hàng</div>
+                    <div id="order-status-chart"></div>
+
+                    <div class="label-chart">Thống kê doanh thu</div>
+                    <div id="revenua-chart"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/charts.js"></script>
+    <script th:inline="javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('findBy')) {
+            const paramValues = urlParams.get('findBy');
+            $("#statistic-select-box").val(paramValues);
+        }
+        $("#statistic-select-box").on('change', function () {
+            $("#statistic-form").submit()
+        })
+
+        var revenuaByMonth = /*[[${revenuaByMonth}]]*/ 'default';
+        var revenuaByDayOfWeek = /*[[${revenuaByDayOfWeek}]]*/ 'default';
+        if (revenuaByMonth != null) {
+            revenuaByMonthChart(revenuaByMonth);
+        } else if (revenuaByDayOfWeek != null) {
+            revenuaByDayOfWeekChart(revenuaByDayOfWeek)
+        }
+
+        var orderStatusByMonth = /*[[${orderStatusByMonth}]]*/ 'default';
+        var orderStatusByDayOkWeek = /*[[${orderStatusByDayOkWeek}]]*/ 'default';
+        if (orderStatusByMonth != null) {
+            orderStatusByMonthChart(orderStatusByMonth);
+        } else if (orderStatusByDayOkWeek != null) {
+            orderStatusByDayOkWeekChart(orderStatusByDayOkWeek);
+        }
+
+        var bestSellingProduct = /*[[${bestSellingProduct}]]*/ 'default';
+        initBestSellingProductChart(bestSellingProduct)
+    </script>
+</body>
+
+</html>

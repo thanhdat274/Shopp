@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>Chi tiết đơn hàng</title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/utility.css">
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .table-p__variant-list>li>span,
+        .table-p__category>a {
+            color: #323232;
+        }
+        thead>tr>td, .gl-text{
+            color: #333333;
+        }
+        thead>tr>td:not(:first-child) {
+            text-align: center;
+        }
+        .btn-fix{
+            margin-top: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <!--====== Header ======-->
+    <header th:replace="/header/header-guest :: header"> </header>
+    <div class="app-content">
+        <div class="section__content">
+            <div class="container">
+                <div class="breadcrumb__wrap" style="margin-top: 15px;margin-bottom: 30px;">
+                    <ul class="breadcrumb__list">
+                        <li class="has-separator">
+                            <a href="/">Trang chủ</a>
+                        </li>
+                        <li class="has-separator">
+                            <a href="/order/all">Lịch sử đặt hàng</a>
+                        </li>
+                        <li class="is-marked">
+                            <a th:href="@{/order/{id}(id=${orderDTO.id})}">Chi tiết đơn hàng</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="section__content u-s-p-b-60">
+            <div class="dash">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-12">
+                            <div class="dash__box dash__box--bg-white dash__box--shadow u-s-m-b-30">
+                                <div class="dash__pad-1">
+                                    <span class="dash__text u-s-m-b-16">test1@gmail.com</span>
+                                    <ul class="dash__f-list">
+                                        <li>
+                                            <a href="/account">Tài khoản</a>
+                                        </li>
+                                        <li>
+                                            <a href="/order/all">Đơn hàng</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-9 col-md-12">
+                            <div style="display: flex;">
+                                <h1 class="dash__h1 u-s-m-b-30" th:text="${'Chi tiết đơn hàng #' + orderDTO.id}"
+                                    style="font-weight: 600;margin-right: 4px;"></h1>
+                                <div class="dash__link dash__link--brand u-s-m-b-30 dash__h1"
+                                    th:switch="${orderDTO.status.name()}"> -
+                                    <span th:case="UNPAID" style="color: #ff4500;">Chưa thanh toán</span>
+                                    <span th:case="PROCESSING" style="color: #009444;">Đang chờ xác nhận</span>
+                                    <span th:case="CONFIRMED" style="color: #009444;">Đã xác nhận</span>
+                                    <span th:case="CANCELED" style="color: #ff4500;">Khách hủy đơn</span>
+                                    <span th:case="REJECTED" style="color: #ff4500;">Shop hủy đơn</span>
+                                    <span th:case="SHIPPING" style="color: #009444;">Đang giao hàng</span>
+                                    <span th:case="SHIPPED" style="color: #009444;">Đã giao hàng</span>
+                                    <span th:case="SHIPMENT_FAILED" style="color: #ff4500;">Giao hàng thất bại</span>
+                                </div>
+                            </div>
+                            <div class="manage-o__timeline" style="margin-bottom: 20px;">
+                                <div class="timeline-row">
+                                    <div class="col-lg-4 u-s-m-b-30" style="max-width: 20%;">
+                                        <div class="timeline-step">
+                                            <div id="status-placed" class="timeline-l-i">
+                                                <span class="timeline-circle"></span>
+                                            </div>
+                                            <span class="timeline-text">Đơn hàng đã đặt</span>
+                                            <span
+                                                th:text="${#temporals.format(orderDTO.create_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 u-s-m-b-30" style="max-width: 20%;">
+                                        <div class="timeline-step">
+                                            <div id="status-processing" class="timeline-l-i">
+                                                <span class="timeline-circle"></span>
+                                            </div>
+                                            <span class="timeline-text">Đã thanh toán</span>
+                                            <span th:if="${orderDTO.paymentDTO != null}"
+                                                th:text="${#temporals.format(orderDTO.paymentDTO.create_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 u-s-m-b-30" style="max-width: 20%;">
+                                        <div class="timeline-step">
+                                            <div id="status-confirmed" class="timeline-l-i">
+                                                <span class="timeline-circle"></span>
+                                            </div>
+                                            <span class="timeline-text">Đã xác nhận</span>
+                                            <span th:if="${orderDTO.confirm_order_date != null}"
+                                                th:text="${#temporals.format(orderDTO.confirm_order_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 u-s-m-b-30" style="max-width: 20%;">
+                                        <div class="timeline-step">
+                                            <div id="status-shipping" class="timeline-l-i">
+                                                <span class="timeline-circle"></span>
+                                            </div>
+                                            <span class="timeline-text">Đã giao cho ĐVVC</span>
+                                            <span th:if="${orderDTO.confirm_shipping_date != null}"
+                                                th:text="${#temporals.format(orderDTO.confirm_shipping_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 u-s-m-b-30" style="max-width: 20%;">
+                                        <div class="timeline-step">
+                                            <div id="status-shipped" class="timeline-l-i">
+                                                <span class="timeline-circle"></span>
+                                            </div>
+                                            <span class="timeline-text">Đã giao hàng</span>
+                                            <span th:if="${orderDTO.confirm_shipped_date != null}"
+                                            th:text="${#temporals.format(orderDTO.confirm_shipped_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                            <span th:if="${orderDTO.canceled_date != null && orderDTO.status.name() == 'CANCELED'}" 
+                                                th:text="${#temporals.format(orderDTO.canceled_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                            <span th:if="${orderDTO.rejected_date != null && orderDTO.status.name() == 'REJECTED'}" 
+                                                th:text="${#temporals.format(orderDTO.rejected_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                            <span th:if="${orderDTO.shipping_failed_date != null && orderDTO.status.name() == 'SHIPMENT_FAILED'}" th:text="${#temporals.format(orderDTO.shipping_failed_date, 'dd/MM/yyyy HH:mm')}"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-lg-4 flex-column">
+                                    <div class="label-title">THÔNG TIN NGƯỜI NHẬN</div>
+                                    <div class="border-box">
+                                        <div class="label-child" th:text="${orderDTO.shipmentDTO.name}"
+                                            style="font-weight: 700;"></div>
+                                        <div class="label-child"
+                                            th:text="${ 'Địa chỉ: '+orderDTO.shipmentDTO.address + ', ' + orderDTO.shipmentDTO.ward_name
+                                                + ', ' + orderDTO.shipmentDTO.district_name + ', ' + orderDTO.shipmentDTO.city_name}">
+                                        </div>
+                                        <div class="label-child"
+                                            th:text="${'Điện thoại: ' + orderDTO.shipmentDTO.phone}"></div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 flex-column">
+                                    <div class="label-title">HÌNH THỨC VẬN CHUYỂN</div>
+                                    <div class="border-box" th:with="orderStatus = ${orderDTO.status.name()}">
+                                        <div class="label-child">Giao hàng nhanh</div>
+                                        <div class="label-child"
+                                            th:if="${orderDTO.shipmentDTO.expected_delivery_date != null && (orderStatus == 'CONFIRMED' || orderStatus == 'SHIPPING')}"
+                                            th:text="${'Ngày giao dự kiến: '+#temporals.format(orderDTO.shipmentDTO.expected_delivery_date, 'dd/MM/yyyy')}">
+                                        </div>
+                                        <div class="label-child"
+                                            th:text="${'Phí vận chuyển: '+#numbers.formatDecimal(orderDTO.shipmentDTO.ship_fee, 0,'POINT',  0, 'POINT') + ' ₫' }">
+                                        </div>
+                                        <div class="label-child" th:if="${orderDTO.shipmentDTO.order_code != null }">Theo dõi đơn hàng 
+                                            <a th:href="@{'https://tracking.ghn.dev/?order_code='+${orderDTO.shipmentDTO.order_code}}">tại đây</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4 flex-column">
+                                    <div class="label-title">THANH TOÁN</div>
+                                    <div class="border-box">
+                                        <th:block th:if="${orderDTO.paymentDTO != null && orderDTO.isPaid == 1}">
+                                            <th:block th:switch="${orderDTO.paymentDTO.paymentMethod.name()}">
+                                                <div th:case="MOMO" class="label-child">Thanh toán qua ví điện tử Momo
+                                                </div>
+                                                <div th:case="VNPAY" class="label-child">Thanh toán qua ví điện tử VnPay
+                                                </div>
+                                            </th:block>
+                                            <i class="fas fa-check-circle icon" th:if="${orderDTO.isRefund != 1}" style="color: green;"> Đã thanh toán</i>
+                                            <i class="fas fa-check-circle icon" th:if="${orderDTO.isRefund == 1}" style="color: green;"> Đã hoàn tiền</i>
+                                        </th:block>
+                                        <th:block th:if="${orderDTO.paymentDTO == null && orderDTO.isPaid == 0}">
+                                            <div class="label-child" style="color: #ff4500;font-style: oblique;">
+                                                Vui lòng thanh toán để đơn hàng được vận chuyển sớm nhất có thể
+                                            </div>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                            <div style="margin: 30px 0 30px 0;">
+                                <table class="table-p">
+                                    <thead>
+                                        <tr>
+                                            <td>Sản phẩm</td>
+                                            <td>Giá</td>
+                                            <td>Số lượng</td>
+                                            <td>Tạm tính</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="orderDetailDTO : ${orderDTO.orderDetailDTOs}">
+                                            <td>
+                                                <div class="table-p__box">
+                                                    <div class="table-p__img-wrap">
+                                                        <img class="u-img-fluid" th:src="${orderDetailDTO.productDTO.thumbnail}"
+                                                            alt="">
+                                                    </div>
+                                                    <div class="table-p__info">
+                                                        <span class="table-p__name">
+                                                            <a th:href="@{/product/{id}(id=${orderDetailDTO.productDTO.id})}"
+                                                                th:text="${orderDetailDTO.productDTO.name}"></a></span>
+                                                        <span class="table-p__category">
+                                                            <a th:href="@{'/product?type=' + ${orderDetailDTO.productDTO.type}}"
+                                                                th:text="${orderDetailDTO.productDTO.type}"></a></span>
+                                                        <ul class="table-p__variant-list"
+                                                            th:if="${orderDetailDTO.skuDTO.variantValueDTO != null}">
+                                                            <li
+                                                                th:each="variant : ${orderDetailDTO.skuDTO.variantValueDTO}">
+                                                                <span th:text="${variant.variant_name + ':'}"> </span>
+                                                                <span th:text="${variant.variant_value}"></span>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="table-p__price" style="text-align: right;"
+                                                    th:text="${#numbers.formatDecimal(orderDetailDTO.skuDTO.price, 0,'POINT',0, 'POINT')+ ' ₫'  }">$125.00</span>
+                                            </td>
+                                            <td>
+                                                <span class="table-p__price"
+                                                    th:text="${orderDetailDTO.quantity}"></span>
+                                            </td>
+                                            <td>
+                                                <span class="table-p__price" style="text-align: right;"
+                                                    th:text="${#numbers.formatDecimal(orderDetailDTO.skuDTO.price * orderDetailDTO.quantity, 0,'POINT',0, 'POINT')+ ' ₫'  }"></span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div style="display: flex;justify-content: right;">
+                                <div class="col-md-6 u-s-m-b-30">
+                                    <div class="f-cart__pad-box">
+                                        <div class="u-s-m-b-30">
+                                            <table class="f-cart__table">
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Tạm tính</td>
+                                                        <td id="sub-total"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Phí vận chuyển</td>
+                                                        <td id="ship-fee"
+                                                            th:text="${#numbers.formatDecimal(orderDTO.shipmentDTO.ship_fee, 0,'POINT',0, 'POINT')+ ' ₫'  }">
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Tổng cộng</td>
+                                                        <td id="total-price"></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        <div>
+                                            <form method="get" th:action="@{/payment}" id="payment-form"
+                                                th:if="${orderDTO.isPaid == 0 && orderDTO.paymentDTO == null && orderDTO.status.name() == 'UNPAID'}">
+                                                <input type="hidden" th:value="${orderDTO.id}" name="order_id">
+                                                <input type="hidden" th:value="${orderDTO.total_price}" name="amount">
+                                                <div class="u-s-m-b-10">
+                                                    <div class="radio-box">
+                                                        <input form="payment-form" type="radio" name="payment_method"
+                                                            value="VNPAY" required>
+                                                        <div class="radio-box__state radio-box__state--primary">
+                                                            <label class="radio-box__label">Thanh toán VnPay</label>
+                                                        </div>
+                                                    </div>
+                                                    <span class="gl-text u-s-m-t-6">Thanh toán qua ví điện tử VnPay</span>
+                                                </div>
+                                                <div class="u-s-m-b-10">
+                                                    <div class="radio-box">
+                                                        <input form="payment-form" type="radio" name="payment_method"
+                                                            value="MOMO" required>
+                                                        <div class="radio-box__state radio-box__state--primary">
+                                                            <label class="radio-box__label" >Thanh toán Momo</label>
+                                                        </div>
+                                                    </div>
+                                                    <span class="gl-text u-s-m-t-6">Thanh toán qua ví điện tử Momo</span>
+                                                </div>
+                                                <button form="payment-form" class="btn btn--e-brand-b-2 btn-fix">THANH TOÁN</button>
+                                            </form>
+                                            <th:block th:with="orderStatus = ${orderDTO.status.name()}" >
+                                                <div th:if="${orderStatus != 'SHIPPED' && orderStatus != 'CANCELED' && orderStatus != 'REJECTED' && orderStatus != 'SHIPMENT_FAILED'}">
+                                                    <form id="form-cancel-order" hidden method="post" th:action="@{/order/cancel}">
+                                                        <input name="id" th:value="${orderDTO.id}">
+                                                    </form>
+                                                    <button data-modal="modal" data-modal-id="#modal-cancel-order" class="btn btn--e-transparent-brand-b-2 btn-fix">HỦY ĐƠN HÀNG</button>
+                                                </div>
+                                            </th:block>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- confirm cancel order modal -->
+        <div class="modal fade" id="modal-cancel-order" style="display: none;" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content modal--shadow">
+                    <div class="modal-body">
+                        <div class="u-s-m-b-15">
+                            <h1 class="gl-modal-h1" style="margin: 20px 0;">Cảnh báo</h1>
+                            <div style="color: red;font-size: 17px;">Bạn muốn hủy đơn hàng này?</div>
+                        </div>
+                        <div class="gl-modal-btn-group" style="justify-content: right;">
+                            <button form="form-cancel-order" class="btn btn--e-brand-b-2" type="submit">XÁC NHẬN</button>
+                            <button class="btn btn--e-transparent-brand-b-2" type="button" data-dismiss="modal">ĐÓNG</button></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer th:replace="/footer/footer :: footer"></footer>
+        <script th:inline="javascript">
+            $(document).ready(function () {
+                var subtotal = 0;
+                var ship_fee = $('#ship-fee').text().replaceAll('.', '').replace(' ₫', '');
+                $('.table-p > tbody > tr').each(function () {
+                    subtotal += +$(this).find('td').eq(3).find('.table-p__price').text().replaceAll('.', '').replace(' ₫', '');
+                })
+                $('#sub-total').text(numberWithCommas(subtotal) + ' ₫');
+                $('#total-price').text(numberWithCommas(+ship_fee + +subtotal) + ' ₫');
+
+                var order_status = /*[[${orderDTO.status}]]*/ 'default';
+                var order = /*[[${orderDTO}]]*/ '';
+                initStatusTimeline(order);
+                
+                
+            });
+            
+        </script>
+        <script src="js/vendor.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/jsscript.js"></script>
+</body>
+
+</html>

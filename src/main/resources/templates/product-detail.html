@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html class="no-js" xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title th:text="${product.name}"></title>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
+    <link href="images/favicon.png" rel="shortcut icon">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+    <link rel="stylesheet" href="css/bootstrap.min.css" >
+    <link rel="stylesheet" href="css/vendor.css">
+    <link rel="stylesheet" href="css/utility.css">
+    <link rel="stylesheet" href="css/app.css">
+    <link rel="stylesheet" href="css/ckeditor.css">
+<style>
+    .u-s-p-t-90{
+        padding-top: 1.5rem;
+    }
+    .pd-detail__name{
+        font-size: 22px;
+        width: 100%;
+        margin: 0 15px 20px 15px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid #e7e7e7;
+    }
+    .pd-breadcrumb {
+        margin-bottom: 1rem;
+        padding-left: 15px;
+        padding-right: 15px;
+        width: 100%;
+    }
+    .pd-detail__policy-list > li i{
+        margin-right: 10px;
+    }
+    .pd-detail__policy-list > li span{
+        color: #4a4a4a;
+    }
+    .size__radio input:checked + label{
+        border-color: #fa4400;
+        color: #fa4400;
+    }
+    body {
+        color: black;
+    }
+</style>
+</head>
+<body>
+    <!--====== Header ======-->
+	<header th:replace="/header/header-guest :: header"> </header>
+    <form id="add_to_cart_form" class="pd-detail__form" th:method="post" th:action="@{/cart}">
+    <div class="app-content">
+        <div class="u-s-p-t-90">
+            <div class="container">
+                <div class="row">
+                    <!--====== Product Breadcrumb ======-->
+                    <div class="pd-breadcrumb u-s-m-b-30" >
+                        <ul class="pd-breadcrumb__list">
+                            <li class="has-separator">
+                                <a href="/">Trang chủ</a></li>
+                            <li class="has-separator">
+                                <a href="#" th:text="${product.type}"></a></li>
+                            <li class="has-separator">
+                                <a href="#" th:text="${product.brand}"></a></li>
+                            <li >
+                                <a href="#" th:text="${product.name}"></a></li>
+                        </ul>
+                    </div>
+                    <span class="pd-detail__name" th:text="${product.name}" >Nikon Camera 4k Lens Zoom Pro</span>
+                    <div class="col-lg-5">
+                    <!--====== Product Image Zoom ======-->
+                    <div class="pd u-s-m-b-30">
+                        <div class="slider-fouc pd-wrap">
+                            <div id="pd-o-initiate">
+                                <div class="pd-o-img-wrap" th:each="img : ${product.imageDTO}" th:data-src="${img.url}">
+                                    <img class="u-img-fluid" th:src="${img.url}" th:data-zoom-image="${img.url}" alt=""></div>
+                            </div>
+                        </div>
+                        <div class="u-s-m-t-15">
+                            <div class="slider-fouc">
+                                <div id="pd-o-thumbnail">
+                                    <div th:each="img : ${product.imageDTO}">
+                                        <img class="u-img-fluid" th:src="${img.url}" alt=""></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--====== End - Product Detail Zoom ======-->
+                    </div>
+                    <!--====== Product Right Side Details ======-->
+                    <div class="col-lg-7">
+                        <div class="pd-detail">
+                            <div class="pd-detail__inline" style="margin-bottom: 25px;">
+                                <span class="pd-detail__price" th:text="${product.price}"></span>
+                            </div>
+                                <div class="u-s-m-b-15"> 
+                                        <div class="u-s-m-b-15" th:each="variant, Stat : ${product.variantDTO}">
+                                            <span class="pd-detail__label u-s-m-b-8" th:text="${variant.name}" ></span>
+                                            <div class="pd-detail__size">
+                                                <div class="size__radio" th:each="value : ${variant.valueDTO}">
+                                                    <input class="rad-btn"  type="radio" th:id="${value.name}" required form="add_to_cart_form"
+                                                        th:name="${variant.name}" th:value="${value.name}" th:classappend="${Stat.index == 0} ? 'first' : '' ">
+                                                    <label class="size__radio-label" th:for="${value.name}" th:text="${value.name}" style="border-width: 2px;"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="quantity-remain" style="font-size: 14px;margin-bottom: 7px;color: #323232;"></div>
+                                        <div class="pd-detail-inline-2">
+                                            <!--====== Input Counter ======-->
+                                            <div class="u-s-m-b-15">
+                                                <div class="input-counter">
+                                                    <span class="input-counter__minus fas fa-minus"></span>
+                                                    <input form="add_to_cart_form" class="input-counter__text input-counter--text-primary-style" name="quantity" type="text" value="1" data-min="1" data-max="1000">
+                                                    <span class="input-counter__plus fas fa-plus"></span></div>
+                                            </div>
+                                            <input id="sku-id-input" form="add_to_cart_form" type="hidden" name="sku_id" th:if="${#lists.size(product.skuDTO) > 1}">
+                                            <input id="sku-id-input" form="add_to_cart_form" type="hidden" name="sku_id" th:if="${#lists.size(product.skuDTO) == 1}" th:value="${product.skuDTO[0].id}">
+                                            <!--====== End - Input Counter ======-->
+                                            <div class="u-s-m-b-15">
+                                                <button class="btn btn--e-brand-b-2" form="add_to_cart_form" type="submit">Thêm vào giỏ</button>
+                                            </div>
+                                        </div>
+                                        <div class="validate-message"></div>
+                                </div>
+                                <div class="u-s-m-b-15 pd-policy-wrap">
+                                    <span class="pd-detail__label u-s-m-b-8">Chính sách mua hàng:</span>
+                                    <ul class="pd-detail__policy-list">
+                                         <li class="pd-policy-item">
+                                            <i class="fas fa-check-circle icon"></i>
+                                            <span>Máy mới 100% , chính hãng. Hoàn tiền 300% nếu phát hiện hàng giả</span>
+                                         </li>
+                                         <li class="pd-policy-item">
+                                            <i class="fas fa-check-circle icon"></i>
+                                            <span>Hộp, Sách hướng dẫn, Cây lấy sim, Cáp sạc</span>
+                                         </li>
+                                         <li class="pd-policy-item">
+                                            <i class="fas fa-check-circle icon"></i>
+                                            <span>1 ĐỔI 1 trong 30 ngày nếu có lỗi phần cứng nhà sản xuất. Bảo hành 12 tháng tại trung tâm bảo hành chính hãng</span>
+                                         </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--====== Product Policys ======-->
+                </div>
+            </div>
+            <!--====== Product Detail Tab ======-->
+            <div class="u-s-p-y-90">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-12" style="display: flex;justify-content: space-between;align-items: flex-start;">
+                            <div style="width: 69%;padding: 12px;border-radius: 20px;box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;">
+                                <h2 class="des-title">Đặc điểm nổi bật</h2>
+                                <div class="ck-content" th:utext="${product.description}">
+                                </div>
+                            </div>
+                            <div style="width: 30%;padding: 12px;border-radius: 20px;box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;"> 
+                                <h2 class="des-title">Thông số kỹ thuật</h2>
+                                <ul class="technical-wrap">
+                                    <li>
+                                        <p>Kích thước màn hình</p>
+                                        <div th:text="${product.screen_size}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Độ phân giải màn hình</p>
+                                        <div th:text="${product.screen_reslution}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Chipset</p>
+                                        <div th:text="${product.cpu}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Dung lượng RAM</p>
+                                        <div th:text="${product.ram}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Bộ nhớ trong</p>
+                                        <div th:text="${product.storage}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Pin</p>
+                                        <div th:text="${product.battery}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Hệ điều hành</p>
+                                        <div th:text="${product.operating_system}"></div>
+                                    </li>
+                                    <li>
+                                        <p>Trọng lượng</p>
+                                        <div th:text="${product.weight}"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        </form>
+    </div>
+    <footer th:replace="/footer/footer :: footer"></footer>
+    <script th:inline="javascript">
+        $.validator.messages.required = 'Vui lòng chọn loại sản phẩm';
+        window.onload=function() {
+            $('input[type="radio"]').prop('checked', false);
+        }
+        $(document).ready(function(){
+        var variants = /*[[${product.variantDTO}]]*/ 'default';
+        var sku = /*[[${product.skuDTO}]]*/ 'default';
+        var totalQuantity = 0;
+        sku.forEach(element => {
+            totalQuantity += element.quantity
+        });
+        if(sku.length == 1 && sku[0].quantity >= 1) {
+            $('#quantity-remain').text('Còn lại: '+sku[0].quantity + ' sản phẩm');
+            $('.input-counter__text').data('max',sku[0].quantity) ;
+        }
+        if(totalQuantity == 0){
+            $('#quantity-remain').text('Sản phẩm đã hết hàng').css({'font-size':'20px', 'margin-bottm':'30px', 'color':'#fa1500','font-weight':'600'})
+            $('.pd-detail-inline-2').remove();
+            $('input[type="radio"]').attr('disabled', true).css('cursor', 'not-allowed').siblings().css('text-decoration', 'line-through');
+        }else if(variants.length == 1) {
+            //if product has  1 variant, disable select box if quantity = 0
+            sku.forEach(element => {
+                if(element.quantity == 0)
+                    $("[id='"+element.variantValueDTO[0].variant_value+"']").attr('disabled', true).css('cursor', 'not-allowed').siblings().css('text-decoration', 'line-through');
+            });
+        }else if(variants.length == 2) {
+            var remainQuantity = 0;
+            sku.forEach(function(item, index) {
+               remainQuantity += item.quantity;
+                if(index == sku.length -1 ){
+                    if(remainQuantity == 0) {
+                        var id = item.variantValueDTO[0].variant_value;
+                        $("[id='"+id+"']").attr('disabled', true).css('cursor', 'not-allowed').siblings().css('text-decoration', 'line-through');
+                    }
+                }else {
+                    var current = item.variantValueDTO[0].variant_value;
+                    var next = sku[index+1].variantValueDTO[0].variant_value;
+                    if(current != next && remainQuantity == 0){
+                        var id = item.variantValueDTO[0].variant_value;
+                        $("[id='"+id+"']").attr('disabled', true).css('cursor', 'not-allowed').siblings().css('text-decoration', 'line-through');
+                    }
+                }
+                remainQuantity = 0;
+            });
+        }
+        //check if product variant are available, if not then disable radio button
+        $('.rad-btn.first').on('change', function(){
+            $('.rad-btn:not(.first)').attr('disabled', false).css('cursor', 'pointer').prop("checked", false).siblings().css('text-decoration', 'none');
+            var first_variant_val = $(this).val();
+            var first_variant_name = $(this).attr("name");      
+            for(var i=0;i<sku.length;i++){
+                var arrVariant = []
+                var check = true;
+                for(var j=0;j<sku[i].variantValueDTO.length;j++){
+                    var temp = sku[i].variantValueDTO[j];
+                    if(temp.variant_name === first_variant_name && temp.variant_value === first_variant_val && sku[i].quantity == 0){
+                        check= false;
+                    }else {
+                        arrVariant.push(new VariantValue(temp.variant_name, temp.variant_value));
+                    }
+                    if(!check){
+                        for(var k=0;k<arrVariant.length;k++){
+                            $('input[name="'+arrVariant[k].variant+'"][value="'+arrVariant[k].value+'"]')
+                                .attr('disabled', true).css('cursor', 'not-allowed').siblings().css('text-decoration', 'line-through');
+                        }
+                    }
+                }
+            }
+        });
+        // update price of variant when click on radio button
+        $('.rad-btn').on('change', function(){
+            const checkedRadios = document.querySelectorAll('input[type="radio"]:checked');
+            const radio_values = Array.from(checkedRadios, radio => radio.value, radio => radio.name );
+            if(radio_values.length == variants.length)
+            for(var i=0;i<sku.length;i++){
+                if(areEqual(sku[i].variantValueDTO, radio_values)){
+                    var price = sku[i].price;
+                    price = numberWithCommas(price)+'  ₫';
+                    $('.pd-detail__price').text(price);
+                    $('.input-counter__text').val('1');
+                    console.log(sku[i].id);
+                    $('#sku-id-input').val(sku[i].id);
+                    //change quantity input max value
+                    $('.input-counter__text').data('max',sku[i].quantity) ;
+                    $('#quantity-remain').text('Còn lại: '+sku[i].quantity + ' sản phẩm')
+                }
+            }
+        });
+    });
+    $('#add_to_cart_form').validate({
+        errorPlacement: function(error, element) {
+            if($('input.error').length > 0)
+            $(".validate-message").text(error[0].innerHTML).css('color','red');
+        },
+        success: function(element){
+            if($('input.error').length > 0)
+                $(".validate-message").text('Vui lòng chọn loại sản phẩm').css('color','red');
+            else 
+                $(".validate-message").text('')
+        },
+        submitHandler: function (form) {
+            var skuID = $("#sku-id-input").val();
+            if(!skuID)
+                $(".validate-message").text('Vui lòng chọn loại sản phẩm').css('color','red');
+            else
+               form.submit();
+        }
+    });
+    </script>
+    <script src="js/vendor.js"></script>
+    <script src="js/jquery.shopnav.js"></script>
+    <script src="js/jsscript.js"></script>
+    <script src="js/app.js"></script>
+</body>

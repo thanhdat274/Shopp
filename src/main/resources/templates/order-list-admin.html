@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <base href="/">
+        <meta charset="utf-8">
+        <title>Quản lý đơn hàng</title>
+        <script src="js/jquery-3.6.0.min.js"></script>
+        <link href="images/favicon.png" rel="shortcut icon">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/app.css">
+        <script src="https://kit.fontawesome.com/7bf2db2eec.js" crossorigin="anonymous"></script>
+        <style>
+            .flx-sp-btw{
+                display: flex;
+                justify-content: space-between;
+            }
+            td, th{
+                text-align: center;
+            }
+            .sm-title{
+                color: black;
+                font-size: 14px;
+            }
+            .marg-right{
+                margin-right: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div style="display: flex;">
+            <!-- Navbar -->
+            <div  th:replace="/header/navbar-admin :: navbar-admin"></div>
+            <div id="page-content-wrapper">
+                <div class="container">
+                    <div class="wrapper border-box">
+                        <ul class="breadcrumb__list">
+                            <li class="has-separator">
+                                <a href="/admin">Trang chủ</a>
+                            </li>
+                            <li class="is-marked">
+                                <a href="/order/all/admin">Quản lý đơn hàng</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="wrapper border-box ">
+                        <form method="get" action="/order/all/admin"
+                            style="margin-bottom: 15px;display: flex;">
+                            <div class="marg-right">
+                                <div class="sm-title">Trạng thái</div>
+                                <select id="select-box-status" name="status" class="select-box select-box--primary-style">
+                                    <option value="ALL">Tất cả</option>
+                                    <option value="UNPAID">Chờ thanh toán</option>
+                                    <option value="PROCESSING" selected>Chờ xác nhận</option>
+                                    <option value="CONFIRMED">Đã xác nhận</option>
+                                    <option value="SHIPPING">Đang giao hàng</option>
+                                    <option value="SHIPPED">Đã giao hàng</option>
+                                    <option value="SHIPMENT_FAILED">Giao thất bại</option>
+                                    <option value="CANCELED">Khách hủy đơn</option>
+                                    <option value="REJECTED">Shop hủy đơn</option>
+                                </select>
+                            </div>
+                            <div class="marg-right">
+                                <div class="sm-title">Thời gian đặt hàng</div>
+                                <div style="display: flex;">
+                                    <div style="margin-right: 15px;">
+                                        <span class="sm-title">Từ ngày</span>
+                                        <input type="date" name="from_date" class="input-text input-text--primary-style">
+                                    </div>
+                                    <div>
+                                        <span class="sm-title">Đến ngày</span>
+                                        <input type="date" name="to_date" class="input-text input-text--primary-style">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="marg-right" style="padding-top: 23px;">
+                                <button type="submit" class="btn btn--e-brand-b-2">
+                                    <span>Tìm kiếm</span></button>
+                            </div>
+                        </form>
+                        <table class="table table-bordered ">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Người nhận</th>
+                                    <th>Sản phẩm</th>
+                                    <th>Giá trị đơn hàng</th>
+                                    <th>Trạng thái</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="orderDTO : ${orderDTOs}">
+                                    <td th:text="${orderDTO.id}"></td>
+                                    <td style="text-align: left;">
+                                        <div th:text="${orderDTO.shipmentDTO.name}"
+                                            style="font-weight: 600;"></div>
+                                        <div th:text="${orderDTO.shipmentDTO.phone +' - ' + orderDTO.shipmentDTO.city_name}"></div>
+                                        <i 
+                                            th:text="${'Ngày đặt: '+ #temporals.format(orderDTO.create_date, 'dd/MM/yyyy')}"></i>
+                                    </td>
+                                    <td>
+                                        <div th:each="orderDetailDTO : ${orderDTO.orderDetailDTOs}" class="flx-sp-btw">
+                                            <span th:text="${orderDetailDTO.productDTO.name}"></span>
+                                            <span th:text="${' x '+orderDetailDTO.quantity}"></span>
+                                        </div>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <div th:each="orderDetailDTO : ${orderDTO.orderDetailDTOs}" 
+                                            th:text="${#numbers.formatDecimal(orderDetailDTO.price * orderDetailDTO.quantity, 0,'POINT',0, 'POINT')+ ' ₫'}">
+                                        </div>
+                                        <div class="flx-sp-btw" style="margin-top: 10px;border-top: 1px solid #cbcbcb;">
+                                            <span>Tổng cộng: </span>
+                                            <span th:text="${#numbers.formatDecimal(orderDTO.total_price, 0,'POINT',0, 'POINT')+ ' ₫'}"
+                                                style="color: #fa4500;"></span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="dash__link dash__link--brand"
+                                            th:switch="${orderDTO.status.name()}">
+                                            <span th:case="UNPAID" style="color: red;">Chưa
+                                                thanh toán</span>
+                                            <span th:case="PROCESSING" style="color: #009444;">Chờ
+                                                xác nhận</span>
+                                            <span th:case="CONFIRMED" style="color: #009444;">Đã xác
+                                                nhận</span>
+                                            <span th:case="CANCELED" style="color: red;">Khách hủy đơn
+                                            </span>
+                                            <span th:case="REJECTED" style="color: red;">Shop hủy đơn</span>
+                                            <span th:case="SHIPPING" style="color: #009444;">Đang
+                                                giao hàng</span>
+                                            <span th:case="SHIPPED" style="color: #009444;">Đã giao
+                                                hàng</span>
+                                            <span th:case="SHIPMENT_FAILED"
+                                                style="color: #ff4500;">Giao hàng thất bại</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <a th:href="@{/order/admin/{id}(id=${orderDTO.id})}"><button class="btn btn--e-brand-b-2 btn-detail">
+                                            <i class="fa-solid fa-circle-info"></i>
+                                            <span>Chi tiết</span></button></a>
+                                    </td>
+                                </tr>
+                                <tr th:if="${orderDTOs.totalPages eq 0}" >
+                                    <td colspan="6">Hiện chưa có đơn hàng</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <ul class="shop-p__pagination" th:if="${orderDTOs.totalPages gt 0}">
+                            <li th:classappend="${orderDTOs.number eq 0} ? 'disabled'">
+                                <a class="fas fa-angle-left pagination-link" th:href="@{/order/all/admin?page={id}(id=${orderDTOs.number lt 2 ? 1 : orderDTOs.number})}"
+                                aria-label="Trang trước" title="Trang trước"></a>
+                            </li>
+                            <li th:classappend="${i eq orderDTOs.number + 1} ? 'is-active'"
+                                th:each="i : ${#numbers.sequence( 1, orderDTOs.totalPages, 1)}">
+                                <a  th:href="@{/order/all/admin?page={id}(id=${i})}" th:text="${i}" class="pagination-link"
+                                    th:title="${'Trang '+ i}">1</a>
+                            </li>
+                            
+                            <li th:classappend="${orderDTOs.number + 1 eq orderDTOs.totalPages} ? 'disabled'">
+                                <a class="fas fa-angle-right pagination-link" th:href="@{/order/all/admin?page={id}(id=${orderDTOs.number + 2})}" 
+                                    aria-label="Trang sau" title="Trang sau" ></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            const queryString = window.location.search;
+            const urlParams = new URLSearchParams(queryString);
+            if(urlParams.has('status')){
+                const paramValues = urlParams.get('status');
+                $("#select-box-status").val(paramValues);
+            }
+            if(urlParams.has('from_date')){
+                const paramValues = urlParams.get('from_date');
+                $('input[name=from_date]').val(paramValues)
+            }
+            if(urlParams.has('to_date')){
+                const paramValues = urlParams.get('to_date');
+                $('input[name=to_date]').val(paramValues)
+            }
+            // change href attribute of pagination to keep filter parameter
+            if (urlParams.has('page')) {
+                urlParams.delete('page');
+            }
+            $("a.pagination-link").each(function () {
+                var $this = $(this);
+                var _href = $this.attr("href");
+                $this.attr("href", _href + '&' + urlParams);
+            });
+        </script>
+    </body>
+</html>

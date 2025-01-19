@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="images/favicon.png" rel="shortcut icon">
+    <title>Đăng nhập</title>
+
+    <!--====== Google Font ======-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
+
+    <!--====== Vendor Css ======-->
+    <link rel="stylesheet" href="css/vendor.css">
+
+    <!--====== Utility-Spacing ======-->
+    <link rel="stylesheet" href="css/utility.css">
+
+    <!--====== App ======-->
+    <link rel="stylesheet" href="css/app.css">
+    <style>
+        .alert-error{
+            color: red;
+            font-weight: 600;
+        }
+        .alert-success{
+            color: green;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body class="config">
+    <div class="preloader is-active">
+        <div class="preloader__wrap">
+
+            <img class="preloader__img" src="images/preloader.png" alt=""></div>
+    </div>
+
+    <!--====== Main App ======-->
+    <div id="app">
+
+
+
+        <!--====== App Content ======-->
+        <div class="app-content">
+
+            <!--====== Section 1 ======-->
+            <div class="u-s-p-y-60" style="padding-bottom: 30px;padding-top: 20px;">
+
+                <!--====== Section Content ======-->
+                <div class="section__content">
+                    <div class="container">
+                        <div class="breadcrumb">
+                            <div class="breadcrumb__wrap">
+                                <ul class="breadcrumb__list">
+                                    <li class="has-separator">
+
+                                        <a th:href="@{/}">Trang chủ</a></li>
+                                    <li class="is-marked">
+
+                                        <a href="/login">Đăng nhập</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--====== End - Section 1 ======-->
+
+
+            <!--====== Section 2 ======-->
+            <div class="u-s-p-b-60" style="padding-bottom: 0px;">
+                <!--====== Section Content ======-->
+                <div class="section__content">
+                    <div class="container">
+                        <div class="row row--center">
+                            <div class="col-lg-6 col-md-8 u-s-m-b-30">
+                                <div class="l-f-o">
+                                    <div class="l-f-o__pad-box">
+                                        <h1 class="gl-h1">ĐĂNG NHẬP</h1>
+										<div class="gl-text u-s-m-b-30 alert-error"></div>
+                                        <div class="gl-text u-s-m-b-30 alert-success" th:if="${success}" th:text="${success}"></div>
+                                        <form class="l-f-o__form" th:action="@{/login}" method="post">
+                                            <div class="u-s-m-b-30">
+
+                                                <label class="gl-label" for="login-email">E-MAIL *</label>
+
+                                                <input class="input-text input-text--primary-style" name="username" type="text" placeholder="Nhập E-mail" required></div>
+                                            <div class="u-s-m-b-30">
+
+                                                <label class="gl-label" for="login-password">MẬT KHẨU *</label>
+
+                                                <input class="input-text input-text--primary-style" name="password" type="password"  placeholder="Nhập Password" required></div>
+                                            <div class="gl-inline">
+                                                <div class="u-s-m-b-30">
+
+                                                    <button class="btn btn--e-transparent-brand-b-2" type="submit">ĐĂNG NHẬP</button></div>
+                                            </div>
+                                            <div class="u-s-m-b-30">
+
+                                                <span style="font-size:13px;font-weight: 600;" >Chưa có tài khoản? <a class="gl-link" href="/sign-up">Đăng ký</a></span>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--====== End - Section Content ======-->
+            </div>
+            <!--====== End - Section 2 ======-->
+        </div>
+        <!--====== End - App Content ======-->
+    </div>
+    <!--====== End - Main App ======-->
+    <script th:inline="javascript">
+        var lockedMessage = /*[[${session['SPRING_SECURITY_LAST_EXCEPTION']}]]*/ '';
+        var generalMessage = /*[[${error}]]*/ '';
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        console.log(lockedMessage);
+        console.log(generalMessage);
+        if(urlParams.has('error') && lockedMessage != null && lockedMessage.message == 'Account disabled')
+            $('.alert-error').text('Tài khoản của bạn đã bị vô hiệu hóa');
+        else if(lockedMessage == null || lockedMessage.message != 'Account disabled')
+            $('.alert-error').text(generalMessage);
+    </script>
+
+
+    <!--====== Vendor Js ======-->
+    <script src="js/vendor.js"></script>
+
+    <!--====== jQuery Shopnav plugin ======-->
+    <script src="js/jquery.shopnav.js"></script>
+
+    <!--====== App ======-->
+    <script src="js/app.js"></script>
+
+    
+</body>
+</html>

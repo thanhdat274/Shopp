@@ -1,0 +1,297 @@
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+.wrapper-all {
+	position: absolute;
+	left: 300px;
+	right: 0;
+}
+.menu-bar{
+	overflow-y:scroll;
+	height: 100vh;
+	width: 15%;
+	background-color: #2F323A;
+	position: sticky;
+	top:0;
+}
+.menu-item {
+	width: 100%;
+	height: 80px;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+}
+.menu-item .icon{
+	width: 70px;
+	color: #AEB2B7;
+	text-align: center;
+}
+.menu-item .icon i{
+	margin: auto;
+	
+}
+.menu-sub {
+	width: 100%;
+	height: 60px;	
+	display: none;
+	cursor: pointer;
+	overflow: hidden;
+}
+.menu-sub div:hover {
+	color: #5DC3B7;
+}
+.menu-sub div{
+	margin-left: 70px;
+	color: #AEB2B7;
+	height: 60px;
+	line-height: 60px;
+	font-size: 17px;
+}
+.menu-item .title{
+	color: #AEB2B7;
+	font-size: 21px;
+}
+.active {
+	background-color: #5DC3B7 ;
+}
+.active .icon {
+	color: #fff !important;
+}
+.active .title{
+	color: #fff !important;
+}
+.page-banner {
+	height: 70px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.page-infor{
+	display: flex;
+	align-items: center;
+}
+.page-infor .icon{
+	width: 50px;
+	text-align: center;
+}
+.page-infor .title{
+	font-size:35px;
+}
+.user-log{
+	height: 45px;
+	border-radius: 20px;
+	display: flex;
+	align-items: center;
+	background-color: #2F323A;
+	cursor: pointer;
+	margin: 0 10px;
+}
+.user-log .icon{
+	width: 60px;
+	text-align: center;
+	color: #fff;
+}
+.user-log .name{
+	margin: 0 3px 0 10px;
+	color: #fff;
+	font-size: 18px;
+}
+.container {
+	max-width: 1200px;
+    width: 100%;
+    padding: 0 15px;
+    margin: auto;
+    box-sizing: border-box;
+}
+.fix-width {
+	height: 600px;
+	max-width: 1400px !important;
+}
+.cinema-item{
+	padding:0 15px;
+	margin: 10px 0;
+	width: 33.333%;
+	height: 120px;
+	box-sizing: border-box;
+	cursor: pointer;
+	
+}
+.cinema-item .inner{
+	border: 1px solid #cecfcf;
+	border-radius:20px;
+	background-color: #fff;
+	height: 100%;
+}
+.cinema-item .inner .title{
+	margin: 6px 10px;
+	font-weight: 700;
+}
+.cinema-item .inner .address{
+	font-size: 12px;
+	margin: 0 10px;
+}
+.cinema-item .inner div i{
+	margin: 6px 10px;
+}
+.cinema-item .activeborder{
+	border: 3px solid #5DC3B7;
+}
+.fa-check-circle{
+	color:#5DC3B7;
+	display: none;
+}
+.activeborder div i{
+	color:#5DC3B7;
+	display: block;
+}
+.activeborder div input{
+	display: none;
+}
+.cinema-checkbox{
+	margin: 9px 17px;
+}
+
+.cinema-input-form{
+	height: 400px;
+	margin: 15px 0;
+	border: 1px solid #fff;
+	background-color: #fff;
+}
+.cinema-input-form .inner {
+	margin: auto;
+	width: 600px;
+	height:100%;
+	display: flex;
+	flex-wrap: wrap;
+	align-content: flex-start;
+}
+.cinema-input-form .inner .wrapper {
+	padding: 10px 10px;
+	box-sizing: border-box;
+	width: 50%;
+	height: 100px;
+}
+textarea:focus,
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="datetime"]:focus,
+input[type="datetime-local"]:focus,
+input[type="date"]:focus,
+input[type="month"]:focus,
+input[type="time"]:focus,
+input[type="week"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="search"]:focus,
+input[type="tel"]:focus,
+input[type="color"]:focus,
+.uneditable-input:focus { border-color: #5dc3b7;  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(93, 195, 183, 0.6); box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(93, 195, 183, 0.6);}
+
+.log-background {
+	background-image: url('/images/login-admin-wallpaper.jpg');
+	background-position:center ;
+	width: 100vw;
+	height: 100vh;
+}
+.log-form {
+	margin-bottom:200px;
+	height: 450px;
+	width:500px;
+	background-color: #fff;
+	border-radius: 20px;
+	border: 1px solid #fff;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+.log-form img {
+	margin-top: -40px;
+}
+.log-form .title-small{
+	margin: 5px 10px 10px 10px;
+}
+.log-form .title{
+	margin: 20px 10px;
+	font-size: 40px;
+	font-weight: 700;
+	color:#4c4c4c;
+}
+.input {
+	width: 300px
+}
+.input-login{
+	display: flex;
+	align-items: center;
+	margin: 16px 10px;
+}
+.input-login .icon{
+	text-align: center;
+	width: 60px;
+}
+.log-form  .input div button {
+	width: 274px;
+	
+}
+.filter {
+	width: 100%;
+	height: 50px;
+	display: flex;
+	border-bottom: 1px solid #d3d3d3;
+	margin-bottom: 30px;
+}
+.filter .clicked {
+	border-bottom: 3px solid red;
+	margin-bottom: -1px;
+	color: red;
+}
+.filter-item {
+	cursor: pointer;
+}
+
+.filter-item div {
+	margin: 0 30px;
+	height: 100%;
+	line-height: 50px;
+	font-size: 20px;
+	font-weight: 600;
+}
+
+.content-box{
+	box-sizing: border-box;
+	width: 85%;
+	padding: 15px;
+}
+
+.hotel-item{
+	display: flex;
+}
+.hotel-in4{
+	height: 100%;
+	margin: 3px;
+	width: 350px;
+	/* border-right: 1px solid #dfdfdf; */
+}
+.hotel-description{
+	display: -webkit-box;
+  overflow : hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical; 
+  font-size: 14px;
+  margin-top: 5px; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
